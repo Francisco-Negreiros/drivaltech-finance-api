@@ -1,7 +1,9 @@
 package com.drivaltech.finance.controller;
 
-import com.drivaltech.finance.domain.Category;
+import com.drivaltech.finance.dto.CategoryRequestDTO;
+import com.drivaltech.finance.dto.CategoryResponseDTO;
 import com.drivaltech.finance.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,12 +19,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category create(@RequestBody Category category) {
-        return service.create(category);
+    public CategoryResponseDTO create(@Valid @RequestBody CategoryRequestDTO dto) {
+        return service.create(dto);
     }
 
     @GetMapping
-    public List<Category> findAll() {
+    public List<CategoryResponseDTO> findAll() {
         return service.findAll();
     }
 }
