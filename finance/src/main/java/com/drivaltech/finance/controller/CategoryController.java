@@ -1,7 +1,7 @@
 package com.drivaltech.finance.controller;
 
 import com.drivaltech.finance.domain.Category;
-import com.drivaltech.finance.repository.CategoryRepository;
+import com.drivaltech.finance.service.CategoryService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,20 +10,19 @@ import java.util.List;
 @RequestMapping("/categories")
 public class CategoryController {
 
-    private final CategoryRepository repository;
+    private final CategoryService service;
 
-    public CategoryController(CategoryRepository repository) {
-        this.repository = repository;
+    public CategoryController(CategoryService service) {
+        this.service = service;
     }
 
     @PostMapping
     public Category create(@RequestBody Category category) {
-        return repository.save(category);
+        return service.create(category);
     }
 
     @GetMapping
     public List<Category> findAll() {
-        return repository.findAll();
+        return service.findAll();
     }
 }
-
