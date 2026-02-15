@@ -5,6 +5,8 @@ import com.drivaltech.finance.dto.CategoryResponseDTO;
 import com.drivaltech.finance.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -26,5 +28,10 @@ public class CategoryController {
     @GetMapping
     public List<CategoryResponseDTO> findAll() {
         return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponseDTO findById(@PathVariable UUID id) {
+        return service.findById(id);
     }
 }

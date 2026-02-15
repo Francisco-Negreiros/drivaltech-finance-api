@@ -4,9 +4,12 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.dto.CategoryRequestDTO;
 import com.drivaltech.finance.dto.CategoryResponseDTO;
 import com.drivaltech.finance.repository.CategoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -35,6 +38,23 @@ public class CategoryService {
                 saved.getActive()
         );
     }
+
+    public CategoryResponseDTO findById(UUID id) {
+
+        Category category = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                );
+
+        return new CategoryResponseDTO(
+                category.getId(),
+                category.getName(),
+                category.getDescription(),
+                category.getColor(),
+                category.getActive()
+        );
+    }
+
 
     public List<CategoryResponseDTO> findAll() {
         return repository.findAll()
