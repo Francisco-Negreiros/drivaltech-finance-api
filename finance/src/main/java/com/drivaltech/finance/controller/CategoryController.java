@@ -34,4 +34,16 @@ public class CategoryController {
     public CategoryResponseDTO findById(@PathVariable UUID id) {
         return service.findById(id);
     }
+
+    @PutMapping("/{id}")
+    public CategoryResponseDTO update(
+            @PathVariable UUID id,
+            @Valid @RequestBody CategoryRequestDTO dto) {
+
+        return service.update(id, dto);
+    }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable UUID id) {
+        service.delete(id);
+    }
 }

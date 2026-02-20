@@ -57,7 +57,7 @@ public class CategoryService {
 
 
     public List<CategoryResponseDTO> findAll() {
-        return repository.findAll()
+        return repository.findByActiveTrue()
                 .stream()
                 .map(category -> new CategoryResponseDTO(
                         category.getId(),
@@ -67,5 +67,39 @@ public class CategoryService {
                         category.getActive()
                 ))
                 .toList();
+    }
+
+    public CategoryResponseDTO update(UUID id, CategoryRequestDTO dto) {
+
+        Category category = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                );
+
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+        category.setColor(dto.getColor());
+
+        Category updated = repository.save(category);
+
+        return new CategoryResponseDTO(
+                updated.getId(),
+                updated.getName(),
+                updated.getDescription(),
+                updated.getColor(),
+                updated.getActive()
+        );
+    }
+
+    public void delete(UUID id) {
+
+        Category category = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                );
+
+        category.setActive(false);
+
+        repository.save(category);
     }
 }
