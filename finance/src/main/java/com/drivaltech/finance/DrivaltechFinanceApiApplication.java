@@ -6,6 +6,7 @@ import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.repository.CategoryRepository;
 import com.drivaltech.finance.repository.TransactionRepository;
 
+import com.drivaltech.finance.service.TransactionService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,18 +26,16 @@ public class DrivaltechFinanceApiApplication {
 
 	@Bean
 	CommandLineRunner runner(CategoryRepository categoryRepository,
-							 TransactionRepository transactionRepository) {
+							 TransactionService transactionService) {
 
 		return args -> {
 
-			// Criar categoria
 			Category category = new Category();
 			category.setName("Food");
 			category.setDescription("Food expenses");
 
 			category = categoryRepository.save(category);
 
-			// Criar transação
 			Transaction transaction = new Transaction();
 			transaction.setDescription("Pizza Friday");
 			transaction.setAmount(new BigDecimal("79.90"));
@@ -44,9 +43,9 @@ public class DrivaltechFinanceApiApplication {
 			transaction.setType(TransactionType.EXPENSE);
 			transaction.setCategory(category);
 
-			transactionRepository.save(transaction);
+			transactionService.create(transaction);
 
-			System.out.println("Transação salva com sucesso!");
+			System.out.println("Transação salva via Service!");
 		};
 	}
 }

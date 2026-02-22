@@ -41,6 +41,5 @@ public class DataTestConfig implements CommandLineRunner {
 
         transactionRepository.save(transaction);
 
-        System.out.println("Transaction salva com sucesso!");
     }
 }
