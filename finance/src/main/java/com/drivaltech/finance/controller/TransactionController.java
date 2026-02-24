@@ -5,6 +5,7 @@ import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
 import com.drivaltech.finance.service.TransactionService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> create(@RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<Transaction> create(@Valid @RequestBody CreateTransactionRequest request) {
 
         Transaction transaction = new Transaction();
         transaction.setDescription(request.getDescription());

@@ -4,7 +4,6 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.repository.CategoryRepository;
-import com.drivaltech.finance.repository.TransactionRepository;
 
 import com.drivaltech.finance.service.TransactionService;
 import org.springframework.boot.CommandLineRunner;
