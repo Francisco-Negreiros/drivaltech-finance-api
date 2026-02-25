@@ -4,6 +4,9 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
+import com.drivaltech.finance.dto.TransactionResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,11 @@ public class TransactionController {
         Transaction saved = transactionService.create(transaction);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @GetMapping
+    public Page<TransactionResponse> list(Pageable pageable) {
+        return transactionService.findAll(pageable);
     }
 
 }

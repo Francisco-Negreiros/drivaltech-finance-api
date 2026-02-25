@@ -1,6 +1,9 @@
 package com.drivaltech.finance.service;
 
 import com.drivaltech.finance.domain.Transaction;
+import com.drivaltech.finance.dto.TransactionResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +26,12 @@ public class TransactionService {
         }
 
         return transactionRepository.save(transaction);
+    }
+
+    public Page<TransactionResponse> findAll(Pageable pageable) {
+
+        return transactionRepository
+                .findAll(pageable)
+                .map(TransactionResponse::fromEntity);
     }
 }
