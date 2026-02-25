@@ -4,6 +4,7 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
+import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +43,11 @@ public class TransactionController {
     }
 
     @GetMapping
-    public Page<TransactionResponse> list(Pageable pageable) {
-        return transactionService.findAll(pageable);
+    public PaginationResponse<TransactionResponse> list(Pageable pageable) {
+
+        var page = transactionService.findAll(pageable);
+
+        return new PaginationResponse<>(page);
     }
 
 }
