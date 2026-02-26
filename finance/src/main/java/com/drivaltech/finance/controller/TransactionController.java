@@ -6,7 +6,6 @@ import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
 import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.service.TransactionService;
 import jakarta.validation.Valid;
@@ -25,7 +24,8 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> create(@Valid @RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<TransactionResponse> create(
+            @Valid @RequestBody CreateTransactionRequest request) {
 
         Transaction transaction = new Transaction();
         transaction.setDescription(request.getDescription());
@@ -39,7 +39,9 @@ public class TransactionController {
 
         Transaction saved = transactionService.create(transaction);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        TransactionResponse response = TransactionResponse.fromEntity(saved);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
