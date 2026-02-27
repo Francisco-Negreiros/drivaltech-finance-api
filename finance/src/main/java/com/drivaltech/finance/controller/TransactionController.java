@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
@@ -43,7 +45,6 @@ public class TransactionController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
     @GetMapping
     public PaginationResponse<TransactionResponse> list(Pageable pageable) {
 
@@ -51,5 +52,11 @@ public class TransactionController {
 
         return new PaginationResponse<>(page);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionResponse> findById(@PathVariable UUID id) {
 
+        TransactionResponse response = transactionService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
 }
