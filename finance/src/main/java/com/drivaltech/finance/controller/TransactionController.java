@@ -4,15 +4,17 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
-import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.service.TransactionService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -45,13 +47,32 @@ public class TransactionController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @GetMapping
-    public PaginationResponse<TransactionResponse> list(Pageable pageable) {
+    public ResponseEntity<Page<TransactionResponse>> findAll(
+            @RequestParam(required = false) TransactionType type,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+            @RequestParam(required = false) UUID categoryId,
+            Pageable pageable
+    ) {
 
-        var page = transactionService.findAll(pageable);
+        Page<TransactionResponse> page =
+                transactionService.findAllWithFilters(
+                        type,
+                        startDate,
+                        endDate,
+                        categoryId,
+                        pageable
+                );
 
-        return new PaginationResponse<>(page);
+        return ResponseEntity.ok(page);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> findById(@PathVariable UUID id) {
 

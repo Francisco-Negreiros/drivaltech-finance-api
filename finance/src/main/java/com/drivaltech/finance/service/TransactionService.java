@@ -7,11 +7,14 @@ import com.drivaltech.finance.dto.CreateTransactionRequest;
 import com.drivaltech.finance.dto.TransactionResponse;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
+import com.drivaltech.finance.specification.TransactionSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.repository.TransactionRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -73,5 +76,20 @@ public class TransactionService {
                         "Transaction not found with id: " + id));
 
         transactionRepository.delete(transaction);
+    }
+    public Page<TransactionResponse> findAllWithFilters(
+            TransactionType type,
+            LocalDate startDate,
+            LocalDate endDate,
+            UUID categoryId,
+            Pageable pageable
+    ) {
+
+        Specification<Transaction> spec =
+                TransactionSpecification.withFilters(type, startDate, endDate, categoryId);
+
+        Page<Transaction> page = transactionRepository.findAll(spec, pageable);
+
+        return page.map(TransactionResponse::fromEntity);
     }
 }
