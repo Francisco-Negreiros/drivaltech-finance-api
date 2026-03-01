@@ -26,4 +26,5 @@ public class TransactionResponse {
     public String getDescription() { return description; }
     public BigDecimal getAmount() { return amount; }
     public TransactionType getType() { return type; }
+
 }
