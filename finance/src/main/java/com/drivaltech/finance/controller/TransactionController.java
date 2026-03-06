@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TransactionResponse> create(
             @Valid @RequestBody CreateTransactionRequest request) {
@@ -48,6 +50,7 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
     public ResponseEntity<Page<TransactionResponse>> findAll(
             @RequestParam(required = false) TransactionType type,
@@ -73,6 +76,7 @@ public class TransactionController {
         return ResponseEntity.ok(page);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> findById(@PathVariable UUID id) {
 
@@ -80,6 +84,7 @@ public class TransactionController {
 
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<TransactionResponse> update(
             @PathVariable UUID id,
@@ -87,6 +92,7 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionService.update(id, request));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
