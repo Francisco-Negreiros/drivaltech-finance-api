@@ -4,6 +4,7 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.dto.CategoryRequestDTO;
 import com.drivaltech.finance.dto.CategoryResponseDTO;
 import com.drivaltech.finance.repository.CategoryRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,7 +55,6 @@ public class CategoryService {
                 category.getActive()
         );
     }
-
 
     public List<CategoryResponseDTO> findAll() {
         return repository.findByActiveTrue()

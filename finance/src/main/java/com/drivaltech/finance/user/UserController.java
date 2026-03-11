@@ -1,19 +1,24 @@
 package com.drivaltech.finance.user;
 
 import com.drivaltech.finance.dto.CreateUserRequest;
+import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.UserResponse;
-import org.springframework.web.bind.annotation.*;
+import com.drivaltech.finance.mapper.UserMapper;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
@@ -25,25 +30,17 @@ public class UserController {
                 request.getRole()
         );
 
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getRole(),
-                user.isActive()
-        );
+        return userMapper.toResponse(user);
     }
+
     @GetMapping
-    public List<UserResponse> getAllUsers() {
+    public PaginationResponse<UserResponse> getAllUsers(Pageable pageable) {
 
-        List<User> users = userService.findAllUsers();
+        Page<User> usersPage = userService.findAllUsers(pageable);
 
-        return users.stream()
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getRole(),
-                        user.isActive()
-                ))
-                .toList();
+        Page<UserResponse> responsePage =
+                usersPage.map(userMapper::toResponse);
+
+        return new PaginationResponse<>(responsePage);
     }
 }
