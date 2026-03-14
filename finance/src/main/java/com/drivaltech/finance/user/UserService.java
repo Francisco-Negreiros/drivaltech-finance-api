@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
 
@@ -27,5 +29,10 @@ public class UserService {
     }
     public Page<User> findAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    public User findUserById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
