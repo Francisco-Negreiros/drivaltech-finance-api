@@ -2,6 +2,7 @@ package com.drivaltech.finance.user;
 
 import com.drivaltech.finance.dto.CreateUserRequest;
 import com.drivaltech.finance.dto.PaginationResponse;
+import com.drivaltech.finance.dto.UpdateUserRequest;
 import com.drivaltech.finance.dto.UserResponse;
 import com.drivaltech.finance.mapper.UserMapper;
 
@@ -61,5 +62,15 @@ public class UserController {
         userService.deactivateUser(id);
 
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/{id}")
+    public UserResponse updateUser(
+            @PathVariable UUID id,
+            @RequestBody UpdateUserRequest request
+    ) {
+
+        User updatedUser = userService.updateUser(id, request);
+
+        return userMapper.toResponse(updatedUser);
     }
 }
