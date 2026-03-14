@@ -1,5 +1,6 @@
 package com.drivaltech.finance.user;
 
+import com.drivaltech.finance.dto.UpdateUserRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -44,5 +45,15 @@ public class UserService {
         user.deactivate();
 
         userRepository.save(user);
+    }
+    public User updateUser(UUID id, UpdateUserRequest request) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setUsername(request.getUsername());
+        user.setRole(request.getRole());
+
+        return userRepository.save(user);
     }
 }
