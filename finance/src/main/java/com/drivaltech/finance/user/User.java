@@ -36,4 +36,5 @@ public class User {
     public String getPassword() { return password; }
     public Role getRole() { return role; }
     public boolean isActive() { return active; }
+    public void deactivate() {this.active = false;}
 }

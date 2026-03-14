@@ -7,6 +7,7 @@ import com.drivaltech.finance.mapper.UserMapper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -52,5 +53,13 @@ public class UserController {
         User user = userService.findUserById(id);
 
         return userMapper.toResponse(user);
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivateUser(@PathVariable UUID id) {
+
+        userService.deactivateUser(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
