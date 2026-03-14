@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -42,5 +44,13 @@ public class UserController {
                 usersPage.map(userMapper::toResponse);
 
         return new PaginationResponse<>(responsePage);
+    }
+
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable UUID id) {
+
+        User user = userService.findUserById(id);
+
+        return userMapper.toResponse(user);
     }
 }
