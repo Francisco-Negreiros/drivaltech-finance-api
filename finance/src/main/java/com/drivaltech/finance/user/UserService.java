@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.drivaltech.finance.exception.ResourceNotFoundException;
 
 import java.util.UUID;
 
@@ -34,5 +35,14 @@ public class UserService {
     public User findUserById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    public void deactivateUser(UUID id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.deactivate();
+
+        userRepository.save(user);
     }
 }
