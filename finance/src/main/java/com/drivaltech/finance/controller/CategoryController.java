@@ -4,9 +4,9 @@ import com.drivaltech.finance.dto.CategoryRequestDTO;
 import com.drivaltech.finance.dto.CategoryResponseDTO;
 import com.drivaltech.finance.service.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -43,6 +43,7 @@ public class CategoryController {
         return service.update(id, dto);
     }
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         service.delete(id);
     }

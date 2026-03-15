@@ -3,6 +3,7 @@ package com.drivaltech.finance.service;
 import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.dto.CategoryRequestDTO;
 import com.drivaltech.finance.dto.CategoryResponseDTO;
+import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
 
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,13 @@ public class CategoryService {
 
     public CategoryResponseDTO create(CategoryRequestDTO dto) {
 
-        Category category = new Category();
-        category.setName(dto.getName());
-        category.setDescription(dto.getDescription());
-        category.setColor(dto.getColor());
-        category.setActive(true);
+        Category category = new Category(
+        null,
+        dto.getName(),
+        dto.getDescription(),
+        dto.getColor(),
+        true
+        );
 
         Category saved = repository.save(category);
 
@@ -36,7 +39,7 @@ public class CategoryService {
                 saved.getName(),
                 saved.getDescription(),
                 saved.getColor(),
-                saved.getActive()
+                saved.isActive()
         );
     }
 
@@ -52,7 +55,7 @@ public class CategoryService {
                 category.getName(),
                 category.getDescription(),
                 category.getColor(),
-                category.getActive()
+                category.isActive()
         );
     }
 
@@ -64,7 +67,7 @@ public class CategoryService {
                         category.getName(),
                         category.getDescription(),
                         category.getColor(),
-                        category.getActive()
+                        category.isActive()
                 ))
                 .toList();
     }
@@ -87,7 +90,7 @@ public class CategoryService {
                 updated.getName(),
                 updated.getDescription(),
                 updated.getColor(),
-                updated.getActive()
+                updated.isActive()
         );
     }
 
@@ -95,10 +98,11 @@ public class CategoryService {
 
         Category category = repository.findById(id)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                        //new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                        new ResourceNotFoundException("Category not found")
                 );
 
-        category.setActive(false);
+        category.deactivate();
 
         repository.save(category);
     }

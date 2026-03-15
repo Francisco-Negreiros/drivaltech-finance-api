@@ -64,12 +64,12 @@ public class Category {
         this.color = color;
     }
 
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void deactivate() {
+        this.active = false;
     }
 
     // getters e setters
