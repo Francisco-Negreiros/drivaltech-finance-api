@@ -31,8 +31,22 @@ public class TransactionService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Transaction create(Transaction transaction) {
-        return transactionRepository.save(transaction);
+    public TransactionResponse create(CreateTransactionRequest request) {
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + request.getCategoryId()));
+
+        Transaction transaction = new Transaction();
+        transaction.setDescription(request.getDescription());
+        transaction.setAmount(request.getAmount());
+        transaction.setDate(request.getDate());
+        transaction.setType(TransactionType.valueOf(request.getType()));
+        transaction.setCategory(category);
+
+        Transaction saved = transactionRepository.save(transaction);
+
+        return TransactionResponse.fromEntity(saved);
     }
 
     public Page<TransactionResponse> findAll(Pageable pageable) {
