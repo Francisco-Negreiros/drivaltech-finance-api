@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Configuration
+//@Configuration
 public class DataTestConfig implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;

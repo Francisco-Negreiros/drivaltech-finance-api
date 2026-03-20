@@ -21,11 +21,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUser(String username, String password, Role role) {
+    public User createUser(String username, String password) {
 
         String encodedPassword = passwordEncoder.encode(password);
 
-        User user = new User(username, encodedPassword, role);
+        User user = new User(
+                username,
+                encodedPassword,
+                Role.USER
+        );
 
         return userRepository.save(user);
     }

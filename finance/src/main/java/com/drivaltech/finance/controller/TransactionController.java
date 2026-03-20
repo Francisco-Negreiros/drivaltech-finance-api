@@ -26,7 +26,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping
     public ResponseEntity<TransactionResponse> create(
             @Valid @RequestBody CreateTransactionRequest request) {
