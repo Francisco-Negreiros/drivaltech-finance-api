@@ -2,6 +2,7 @@ package com.drivaltech.finance.specification;
 
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
+import com.drivaltech.finance.user.User;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Predicate;
@@ -16,12 +17,15 @@ public class TransactionSpecification {
             TransactionType type,
             LocalDate startDate,
             LocalDate endDate,
-            UUID categoryId
+            UUID categoryId,
+            User user
     ) {
 
         return (root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.equal(root.get("user"), user));
 
             if (type != null) {
                 predicates.add(cb.equal(root.get("type"), type));

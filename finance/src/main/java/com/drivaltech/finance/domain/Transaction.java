@@ -1,5 +1,6 @@
 package com.drivaltech.finance.domain;
 
+import com.drivaltech.finance.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,10 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Boolean active = true;
