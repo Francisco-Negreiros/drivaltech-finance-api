@@ -93,14 +93,26 @@ public class TransactionService {
 
         return TransactionResponse.fromEntity(transaction);
     }
+
     public void delete(UUID id) {
 
-        Transaction transaction = transactionRepository.findById(id)
+        User user = getAuthenticatedUser();
+
+        Transaction transaction = transactionRepository
+                .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Transaction not found with id: " + id));
 
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("You do not have permission to delete this transaction");
+        }
+
         transactionRepository.delete(transaction);
     }
+
     public Page<TransactionResponse> findAllWithFilters(
             TransactionType type,
             LocalDate startDate,

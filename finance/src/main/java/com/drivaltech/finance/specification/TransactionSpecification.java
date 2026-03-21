@@ -25,7 +25,9 @@ public class TransactionSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            predicates.add(cb.equal(root.get("user"), user));
+            if (user != null) {
+                predicates.add(cb.equal(root.get("user"), user));
+            }
 
             if (type != null) {
                 predicates.add(cb.equal(root.get("type"), type));
