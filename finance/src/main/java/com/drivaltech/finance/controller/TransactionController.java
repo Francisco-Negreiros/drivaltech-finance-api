@@ -70,7 +70,7 @@ public class TransactionController {
 
         return ResponseEntity.ok(response);
     }
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping("/{id}")
     public ResponseEntity<TransactionResponse> update(
             @PathVariable UUID id,
@@ -78,6 +78,7 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionService.update(id, request));
     }
+
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {

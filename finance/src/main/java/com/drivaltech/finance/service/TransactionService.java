@@ -65,19 +65,40 @@ public class TransactionService {
                 .findAll(pageable)
                 .map(TransactionResponse::fromEntity);
     }
+
     public TransactionResponse findById(UUID id) {
+
+        User user = getAuthenticatedUser();
 
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Transaction not found with id: " + id)
                 );
 
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("You do not have permission to access this transaction");
+        }
+
         return TransactionResponse.fromEntity(transaction);
     }
+
     public TransactionResponse update(UUID id, CreateTransactionRequest request) {
 
+        User user = getAuthenticatedUser();
+
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Transaction not found with id: " + id));
+
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new RuntimeException("You do not have permission to update this transaction");
+        }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(
