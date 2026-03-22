@@ -1,8 +1,6 @@
-package com.drivaltech.finance.controller.exception;
+package com.drivaltech.finance.exception;
 
 import com.drivaltech.finance.dto.ErrorResponse;
-import com.drivaltech.finance.exception.BusinessException;
-import com.drivaltech.finance.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -60,4 +58,14 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handleForbidden(ForbiddenException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(Map.of(
+                        "error", "Forbidden",
+                        "message", ex.getMessage()
+                ));
+    }
 }
+

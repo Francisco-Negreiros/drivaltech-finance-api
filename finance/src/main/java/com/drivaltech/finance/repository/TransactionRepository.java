@@ -21,10 +21,11 @@ public interface TransactionRepository
     Optional<Transaction> findByIdAndUser(UUID id, User user);
 
     @Query("""
-       SELECT
-       COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END),0) AS income,
-       COALESCE(SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END),0) AS expense
-       FROM Transaction t
-       """)
-    DashboardSummaryProjection getDashboardSummary();
+    SELECT 
+        SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END)  AS income,
+        SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END) AS expense
+    FROM Transaction t
+    WHERE t.user.id = :userId
+""")
+    DashboardSummaryProjection getSummaryByUserId(UUID userId);
 }

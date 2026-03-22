@@ -1,6 +1,7 @@
 package com.drivaltech.finance.dashboard;
 
 import com.drivaltech.finance.dto.DashboardSummaryResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +15,7 @@ public class DashboardController {
     }
 
     @GetMapping("/dashboard/summary")
-    public DashboardSummaryResponse getSummary() {
-        return dashboardService.getSummary();
+    public ResponseEntity<DashboardSummaryResponse> getSummary() {
+        return ResponseEntity.ok(dashboardService.getSummary());
     }
 }
