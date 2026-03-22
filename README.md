@@ -109,6 +109,7 @@ controller → service → repository → database
 
 ### 📊 Dashboard
 - `GET /dashboard/summary`
+- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
 
 ---
 
