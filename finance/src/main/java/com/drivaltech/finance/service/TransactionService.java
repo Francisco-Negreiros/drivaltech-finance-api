@@ -5,6 +5,7 @@ import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
 import com.drivaltech.finance.dto.TransactionResponse;
+import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
 import com.drivaltech.finance.specification.TransactionSpecification;
@@ -79,7 +80,7 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
-            throw new RuntimeException("You do not have permission to access this transaction");
+            throw new ForbiddenException("You do not have permission to access this transaction");
         }
 
         return TransactionResponse.fromEntity(transaction);
@@ -97,7 +98,7 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
-            throw new RuntimeException("You do not have permission to update this transaction");
+            throw new ForbiddenException("You do not have permission to update this transaction");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
@@ -128,7 +129,7 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
-            throw new RuntimeException("You do not have permission to delete this transaction");
+            throw new ForbiddenException("You do not have permission to delete this transaction");
         }
 
         transactionRepository.delete(transaction);
@@ -157,6 +158,7 @@ public class TransactionService {
 
         return page.map(TransactionResponse::fromEntity);
     }
+
     private String getLoggedUsername() {
         Authentication authentication = SecurityContextHolder
                 .getContext()
