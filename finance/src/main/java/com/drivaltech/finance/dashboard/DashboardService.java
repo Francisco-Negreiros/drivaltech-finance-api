@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 public class DashboardService {
@@ -23,12 +24,20 @@ public class DashboardService {
         this.userRepository = userRepository;
     }
 
-    public DashboardSummaryResponse getSummary() {
+    public DashboardSummaryResponse getSummary(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
 
         User user = getAuthenticatedUser();
 
         DashboardSummaryProjection projection =
-                transactionRepository.getSummaryByUserId(user.getId());
+                transactionRepository.getSummaryByUserIdAndDate(
+                        user.getId(),
+                        startDate,
+                        endDate
+                );
+
         if (projection == null) {
             return new DashboardSummaryResponse(
                     BigDecimal.ZERO,
