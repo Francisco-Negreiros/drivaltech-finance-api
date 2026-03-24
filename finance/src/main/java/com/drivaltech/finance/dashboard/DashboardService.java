@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class DashboardService {
@@ -26,8 +27,8 @@ public class DashboardService {
 
     public DashboardSummaryResponse getSummary(
             LocalDate startDate,
-            LocalDate endDate
-    ) {
+            LocalDate endDate,
+            UUID categoryId) {
 
         User user = getAuthenticatedUser();
 
@@ -35,7 +36,8 @@ public class DashboardService {
                 transactionRepository.getSummaryByUserIdAndDate(
                         user.getId(),
                         startDate,
-                        endDate
+                        endDate,
+                        categoryId
                 );
 
         if (projection == null) {
