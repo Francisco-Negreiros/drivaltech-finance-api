@@ -29,11 +29,12 @@ public interface TransactionRepository
     WHERE t.user.id = :userId
     AND t.date >= COALESCE(:startDate, t.date)
     AND t.date <= COALESCE(:endDate, t.date)
+    AND t.category.id = COALESCE(:categoryId, t.category.id)
 """)
     DashboardSummaryProjection getSummaryByUserIdAndDate(
             UUID userId,
             LocalDate startDate,
-            LocalDate endDate
+            LocalDate endDate,
+            UUID categoryId
     );
-
 }
