@@ -35,7 +35,7 @@ O projeto segue boas práticas de arquitetura e desenvolvimento backend profissi
 - ✅ Multi-tenant data isolation
 - ✅ CRUD for transactions
 - ✅ Category management
-- ✅ Dashboard summary (income / expense / balance)
+- ✅ Dashboard summary with dynamic filters (date, category, type)
 - ✅ Secure endpoints with Spring Security
 - ✅ Global exception handling
 
@@ -109,9 +109,10 @@ controller → service → repository → database
 
 ### 📊 Dashboard
 - `GET /dashboard/summary`
+- `GET /dashboard/summary?type=INCOME|EXPENSE`
 - `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
 - `GET /dashboard/summary?categoryId=UUID`
-- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&categoryId=UUID`
+- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&categoryId=UUID&type=INCOME|EXPENSE`
 
 ---
 
@@ -155,7 +156,7 @@ spring:
 ---
 
 ## 📌 Future Improvements
-### Dashboard with filters (date range, category)   
+### Dashboard with advanced analytics (charts, trends)  
 ### Redis caching   
 ### Docker support   
 ### CI/CD pipeline   
