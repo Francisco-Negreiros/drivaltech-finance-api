@@ -1,5 +1,6 @@
 package com.drivaltech.finance.dashboard;
 
+import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.DashboardSummaryResponse;
 import com.drivaltech.finance.repository.TransactionRepository;
 import com.drivaltech.finance.user.User;
@@ -28,16 +29,23 @@ public class DashboardService {
     public DashboardSummaryResponse getSummary(
             LocalDate startDate,
             LocalDate endDate,
-            UUID categoryId) {
+            UUID categoryId, String type) {
 
         User user = getAuthenticatedUser();
+
+        TransactionType transactionType = null;
+
+        if (type != null) {
+            transactionType = TransactionType.valueOf(type);
+        }
 
         DashboardSummaryProjection projection =
                 transactionRepository.getSummaryByUserIdAndDate(
                         user.getId(),
                         startDate,
                         endDate,
-                        categoryId
+                        categoryId,
+                        transactionType
                 );
 
         if (projection == null) {

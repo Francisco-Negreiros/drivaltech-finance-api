@@ -2,6 +2,7 @@ package com.drivaltech.finance.repository;
 
 import com.drivaltech.finance.dashboard.DashboardSummaryProjection;
 import com.drivaltech.finance.domain.Transaction;
+import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TransactionRepository
         extends JpaRepository<Transaction, UUID>,
@@ -30,11 +32,19 @@ public interface TransactionRepository
     AND t.date >= COALESCE(:startDate, t.date)
     AND t.date <= COALESCE(:endDate, t.date)
     AND t.category.id = COALESCE(:categoryId, t.category.id)
+    AND t.type = COALESCE(:type, t.type)
 """)
-    DashboardSummaryProjection getSummaryByUserIdAndDate(
+   /* DashboardSummaryProjection getSummaryByUserIdAndDate(
             UUID userId,
             LocalDate startDate,
             LocalDate endDate,
-            UUID categoryId
+            UUID categoryId,
+            TransactionType transactionType);*/
+    DashboardSummaryProjection getSummaryByUserIdAndDate(
+            @Param("userId") UUID userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("categoryId") UUID categoryId,
+            @Param("type") TransactionType type
     );
 }

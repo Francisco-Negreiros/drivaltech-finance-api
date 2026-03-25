@@ -34,10 +34,13 @@ public class DashboardController {
             LocalDate endDate,
 
             @RequestParam(required = false)
-            UUID categoryId
+            UUID categoryId,
+
+            @RequestParam(required = false)
+                    String type
     ) {
         return ResponseEntity.ok(
-                dashboardService.getSummary(startDate, endDate, categoryId)
+                dashboardService.getSummary(startDate, endDate, categoryId, type)
         );
     }
 }
