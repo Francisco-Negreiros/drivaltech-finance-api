@@ -1,5 +1,6 @@
 package com.drivaltech.finance.dashboard;
 
+import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.DashboardSummaryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,7 @@ public class DashboardController {
             UUID categoryId,
 
             @RequestParam(required = false)
-                    String type
+            TransactionType type
     ) {
         return ResponseEntity.ok(
                 dashboardService.getSummary(startDate, endDate, categoryId, type)

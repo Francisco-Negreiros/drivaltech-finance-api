@@ -34,12 +34,7 @@ public interface TransactionRepository
     AND t.category.id = COALESCE(:categoryId, t.category.id)
     AND t.type = COALESCE(:type, t.type)
 """)
-   /* DashboardSummaryProjection getSummaryByUserIdAndDate(
-            UUID userId,
-            LocalDate startDate,
-            LocalDate endDate,
-            UUID categoryId,
-            TransactionType transactionType);*/
+
     DashboardSummaryProjection getSummaryByUserIdAndDate(
             @Param("userId") UUID userId,
             @Param("startDate") LocalDate startDate,
