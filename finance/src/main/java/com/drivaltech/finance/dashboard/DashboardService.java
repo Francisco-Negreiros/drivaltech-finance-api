@@ -4,10 +4,8 @@ import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.DashboardSummaryResponse;
 import com.drivaltech.finance.repository.TransactionRepository;
 import com.drivaltech.finance.user.User;
-import com.drivaltech.finance.user.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.drivaltech.finance.service.AuthService;
 
 
 import java.math.BigDecimal;
@@ -18,26 +16,20 @@ import java.util.UUID;
 public class DashboardService {
 
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
+    private final AuthService authService;
 
     public DashboardService(TransactionRepository transactionRepository,
-                            UserRepository userRepository) {
+                            AuthService authService) {
         this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public DashboardSummaryResponse getSummary(
             LocalDate startDate,
             LocalDate endDate,
-            UUID categoryId, String type) {
+            UUID categoryId, TransactionType type) {
 
-        User user = getAuthenticatedUser();
-
-        TransactionType transactionType = null;
-
-        if (type != null) {
-            transactionType = TransactionType.valueOf(type);
-        }
+        User user = authService.getAuthenticatedUser();
 
         DashboardSummaryProjection projection =
                 transactionRepository.getSummaryByUserIdAndDate(
@@ -45,7 +37,7 @@ public class DashboardService {
                         startDate,
                         endDate,
                         categoryId,
-                        transactionType
+                        type
                 );
 
         if (projection == null) {
@@ -67,19 +59,5 @@ public class DashboardService {
         BigDecimal balance = income.subtract(expense);
 
         return new DashboardSummaryResponse(income, expense, balance);
-    }
-
-    private String getLoggedUsername() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        return authentication.getName();
-    }
-    private User getAuthenticatedUser() {
-        String username = getLoggedUsername();
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

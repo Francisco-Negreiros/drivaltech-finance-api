@@ -1,6 +1,6 @@
-# 💰 DrivalTech Finance API
+# DrivalTech Finance API
 
-## 🇺🇸 Overview
+## Overview
 
 This is a financial management API built with Spring Boot, designed to simulate real-world backend scenarios such as:
 
@@ -14,7 +14,7 @@ The project follows clean architecture principles and focuses on best practices 
 
 ---
 
-## 🇧🇷 Visão Geral
+## Visão Geral
 
 Esta é uma API de gerenciamento financeiro desenvolvida com Spring Boot, simulando cenários reais de backend, como:
 
@@ -28,20 +28,21 @@ O projeto segue boas práticas de arquitetura e desenvolvimento backend profissi
 
 ---
 
-## 🚀 Features
+## Features
 
-- ✅ User authentication (JWT)
-- ✅ Role-based authorization
-- ✅ Multi-tenant data isolation
-- ✅ CRUD for transactions
-- ✅ Category management
-- ✅ Dashboard summary with dynamic filters (date, category, type)
-- ✅ Secure endpoints with Spring Security
-- ✅ Global exception handling
+- JWT-based authentication and authorization
+- Role-based access control (ADMIN / USER)
+- Multi-tenant data isolation (user-specific data access)
+- Full CRUD for transactions
+- Category management (CRUD)
+- Dashboard financial summary (income, expense, balance)
+- Dynamic filtering (date range, category, transaction type)
+- Secure REST endpoints with Spring Security
+- Global exception handling with standardized responses
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - Java 17+
 - Spring Boot
@@ -53,20 +54,21 @@ O projeto segue boas práticas de arquitetura e desenvolvimento backend profissi
 
 ---
 
-## 🧱 Architecture
+## Architecture
 
 The project is structured following layered architecture:
 
 controller → service → repository → database
 
-## Additional layers:
-- `dto` for data transfer
-- `exception` for global error handling
-- `security` for authentication and authorization
+### Additional layers:
+- `dto` – data transfer objects for request/response separation
+- `exception` – centralized global error handling
+- `security` – authentication and authorization (JWT)
+- `specification` – dynamic query filtering (JPA Specifications)
 
 ---
 
-## 🔐 Security
+## Security
 
 - JWT-based authentication
 - Role-based authorization (ADMIN / USER)
@@ -75,31 +77,46 @@ controller → service → repository → database
 
 ---
 
-## 📊 Dashboard Example
+## Dashboard
+
+- `GET /dashboard/summary`
+
+### Optional filters:
+
+- `type=INCOME|EXPENSE`
+- `startDate=YYYY-MM-DD`
+- `endDate=YYYY-MM-DD`
+- `categoryId=UUID`
+
+### Example:
+
+#### GET /dashboard/summary?startDate=2026-01-01&endDate=2026-03-31&type=INCOME
+
+### Dashboard Example
 
 ```json
 {
   "income": 5000.00,
-  "expense": 1000.00,
-  "balance": 4000.00
+  "expense":   0.00,
+  "balance":5000.00
 }
 ```
 ---
 
-## 📡 Main Endpoints
+## Main Endpoints
 
-### 🔐 Auth
+### Auth
 - `POST /auth/login`
 
 ---
 
-### 👤 Users
+### Users
 - `POST /users`
 - `GET /users`
 
 ---
 
-### 💸 Transactions
+### Transactions
 - `POST /transactions`
 - `GET /transactions`
 - `PUT /transactions/{id}`
@@ -107,7 +124,7 @@ controller → service → repository → database
 
 ---
 
-### 📊 Dashboard
+### Dashboard
 - `GET /dashboard/summary`
 - `GET /dashboard/summary?type=INCOME|EXPENSE`
 - `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
@@ -116,7 +133,7 @@ controller → service → repository → database
 
 ---
 
-## ⚙️ How to Run
+## How to Run
 
 ### 1. Clone the repository
 ```bash
@@ -139,7 +156,7 @@ spring:
 
 ---
    
-## 🧪 Testing
+## Testing
 
 ### You can test the API using:
 
@@ -148,18 +165,18 @@ spring:
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 ## Valter
-### Backend Developer in progress 🚀
+### Backend Developer in progress 
 
 ---
 
-## 📌 Future Improvements
-### Dashboard with advanced analytics (charts, trends)  
-### Redis caching   
-### Docker support   
-### CI/CD pipeline   
-### Frontend integration
+## Future Improvements
+- Advanced dashboard analytics (charts, trends)
+- Redis caching for performance optimization
+- Docker containerization
+- CI/CD pipeline integration
+- Frontend integration (React or similar)
 
 
