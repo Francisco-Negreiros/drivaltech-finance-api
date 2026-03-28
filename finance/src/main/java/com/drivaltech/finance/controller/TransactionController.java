@@ -2,6 +2,7 @@ package com.drivaltech.finance.controller;
 
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
+import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
 import com.drivaltech.finance.service.TransactionService;
 import jakarta.validation.Valid;
@@ -38,28 +39,17 @@ public class TransactionController {
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
-    public ResponseEntity<Page<TransactionResponse>> findAll(
-            @RequestParam(required = false) TransactionType type,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate,
-            @RequestParam(required = false) UUID categoryId,
-            Pageable pageable
+    public ResponseEntity<PaginationResponse<TransactionResponse>> findAll(
+
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "date,desc") String[] sort,
+            @RequestParam(required = false) String type
     ) {
 
-        Page<TransactionResponse> page =
-                transactionService.findAllWithFilters(
-                        type,
-                        startDate,
-                        endDate,
-                        categoryId,
-                        pageable
-                );
-
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(
+                transactionService.findAll(page, size, sort, type)
+        );
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")

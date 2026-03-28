@@ -23,6 +23,12 @@ public interface TransactionRepository
 
     Optional<Transaction> findByIdAndUser(UUID id, User user);
 
+    Page<Transaction> findByUserAndType(
+            User user,
+            TransactionType type,
+            Pageable pageable
+    );
+
     @Query("""
     SELECT 
         SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE 0 END) AS income,
