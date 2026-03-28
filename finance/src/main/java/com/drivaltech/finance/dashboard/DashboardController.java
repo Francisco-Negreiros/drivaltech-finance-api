@@ -1,6 +1,7 @@
 package com.drivaltech.finance.dashboard;
 
 import com.drivaltech.finance.domain.TransactionType;
+import com.drivaltech.finance.dto.DashboardAnalyticsResponse;
 import com.drivaltech.finance.dto.DashboardSummaryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +16,12 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    public DashboardController(DashboardService dashboardService) {
+    private final DashboardAnalyticsService dashboardAnalyticsService;
+
+    public DashboardController(DashboardService dashboardService,
+                               DashboardAnalyticsService dashboardAnalyticsService) {
         this.dashboardService = dashboardService;
+        this.dashboardAnalyticsService = dashboardAnalyticsService;
     }
 
     @GetMapping("/dashboard/summary")
@@ -42,6 +47,26 @@ public class DashboardController {
     ) {
         return ResponseEntity.ok(
                 dashboardService.getSummary(startDate, endDate, categoryId, type)
+        );
+    }
+
+    @GetMapping("/dashboard/analytics")
+    public ResponseEntity<DashboardAnalyticsResponse> getAnalytics(
+
+            @RequestParam
+            @org.springframework.format.annotation.DateTimeFormat(
+                    iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE
+            )
+            LocalDate startDate,
+
+            @RequestParam
+            @org.springframework.format.annotation.DateTimeFormat(
+                    iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE
+            )
+            LocalDate endDate
+    ) {
+        return ResponseEntity.ok(
+                dashboardAnalyticsService.getAnalytics(startDate, endDate)
         );
     }
 }
