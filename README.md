@@ -131,6 +131,15 @@ controller → service → repository → database
 - `GET /dashboard/summary?categoryId=UUID`
 - `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&categoryId=UUID&type=INCOME|EXPENSE`
 
+### Dashboard Analytics
+
+- `GET /dashboard/analytics?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+
+#### Returns financial insights including:
+
+- Current vs previous period comparison
+- Income, expense and balance growth (%)
+
 ---
 
 ## How to Run
