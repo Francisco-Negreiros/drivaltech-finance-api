@@ -1,6 +1,8 @@
 package com.drivaltech.finance.dto;
 
 import org.springframework.data.domain.Page;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public class PaginationResponse<T> {
@@ -11,6 +13,7 @@ public class PaginationResponse<T> {
     private final long totalElements;
     private final int totalPages;
     private final boolean hasNext;
+    private LocalDate date;
 
     public PaginationResponse(Page<T> pageObj) {
         this.data = pageObj.getContent();
@@ -27,4 +30,5 @@ public class PaginationResponse<T> {
     public long getTotalElements() { return totalElements; }
     public int getTotalPages() { return totalPages; }
     public boolean isHasNext() { return hasNext; }
+
 }

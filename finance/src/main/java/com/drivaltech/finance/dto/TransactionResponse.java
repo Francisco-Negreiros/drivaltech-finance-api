@@ -4,6 +4,7 @@ import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class TransactionResponse {
@@ -12,6 +13,7 @@ public class TransactionResponse {
     private String description;
     private BigDecimal amount;
     private TransactionType type;
+    private LocalDate date;
 
     public static TransactionResponse fromEntity(Transaction transaction) {
         TransactionResponse response = new TransactionResponse();
@@ -19,6 +21,7 @@ public class TransactionResponse {
         response.description = transaction.getDescription();
         response.amount = transaction.getAmount();
         response.type = transaction.getType();
+        response.date = transaction.getDate();
         return response;
     }
 
@@ -26,5 +29,5 @@ public class TransactionResponse {
     public String getDescription() { return description; }
     public BigDecimal getAmount() { return amount; }
     public TransactionType getType() { return type; }
-
+    public LocalDate getDate() { return date; }
 }

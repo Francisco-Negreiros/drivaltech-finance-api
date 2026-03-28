@@ -4,6 +4,7 @@ import com.drivaltech.finance.domain.Category;
 import com.drivaltech.finance.domain.Transaction;
 import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
+import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
 import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
@@ -171,5 +172,58 @@ public class TransactionService {
 
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public PaginationResponse<TransactionResponse> findAll(
+            int page,
+            int size,
+            String[] sort,
+            String type
+    ) {
+
+        // Ordenação
+        String sortField = sort[0];
+        String sortDirection = sort.length > 1 ? sort[1] : "asc";
+
+        org.springframework.data.domain.Sort.Direction direction =
+                sortDirection.equalsIgnoreCase("desc")
+                        ? org.springframework.data.domain.Sort.Direction.DESC
+                        : org.springframework.data.domain.Sort.Direction.ASC;
+
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(
+                        page,
+                        size,
+                        org.springframework.data.domain.Sort.by(direction, sortField)
+                );
+
+        // Usuário autenticado
+        com.drivaltech.finance.user.User user = getAuthenticatedUser();
+
+        // Filtro por tipo (se existir)
+        com.drivaltech.finance.domain.TransactionType transactionType = null;
+
+        if (type != null) {
+            transactionType = com.drivaltech.finance.domain.TransactionType.valueOf(type);
+        }
+
+        // Query
+        org.springframework.data.domain.Page<com.drivaltech.finance.domain.Transaction> result;
+
+        if (transactionType != null) {
+            result = transactionRepository.findByUserAndType(user, transactionType, pageable);
+        } else {
+            result = transactionRepository.findByUser(user, pageable);
+        }
+
+        // Mapear para DTO
+        java.util.List<TransactionResponse> content = result
+                .stream()
+                .map(TransactionResponse::fromEntity)
+                .toList();
+
+        return new PaginationResponse<>(
+                result.map(TransactionResponse::fromEntity)
+        );
     }
 }

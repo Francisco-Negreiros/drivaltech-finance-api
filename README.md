@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a financial management API built with Spring Boot, designed to simulate real-world backend scenarios such as:
+### This is a financial management API built with Spring Boot, designed to simulate real-world backend scenarios such as:
 
 - User authentication and authorization (JWT)
 - Role-based access control (ADMIN / USER)
@@ -10,13 +10,13 @@ This is a financial management API built with Spring Boot, designed to simulate 
 - Transaction management
 - Dashboard financial summary (income, expense, balance)
 
-The project follows clean architecture principles and focuses on best practices used in real backend systems.
+### The project follows clean architecture principles and focuses on best practices used in real backend systems.
 
 ---
 
 ## Visão Geral
 
-Esta é uma API de gerenciamento financeiro desenvolvida com Spring Boot, simulando cenários reais de backend, como:
+### Esta é uma API de gerenciamento financeiro desenvolvida com Spring Boot, simulando cenários reais de backend, como:
 
 - Autenticação e autorização com JWT
 - Controle de acesso por perfil (ADMIN / USER)
@@ -24,7 +24,7 @@ Esta é uma API de gerenciamento financeiro desenvolvida com Spring Boot, simula
 - Gerenciamento de transações
 - Resumo financeiro (receita, despesa e saldo)
 
-O projeto segue boas práticas de arquitetura e desenvolvimento backend profissional.
+### O projeto segue boas práticas de arquitetura e desenvolvimento backend profissional.
 
 ---
 
@@ -33,10 +33,11 @@ O projeto segue boas práticas de arquitetura e desenvolvimento backend profissi
 - JWT-based authentication and authorization
 - Role-based access control (ADMIN / USER)
 - Multi-tenant data isolation (user-specific data access)
-- Full CRUD for transactions
+- Full CRUD for transactions with pagination, sorting and filtering
 - Category management (CRUD)
 - Dashboard financial summary (income, expense, balance)
 - Dynamic filtering (date range, category, transaction type)
+- Pagination and sorting support (page, size, sort)
 - Secure REST endpoints with Spring Security
 - Global exception handling with standardized responses
 
@@ -56,16 +57,16 @@ O projeto segue boas práticas de arquitetura e desenvolvimento backend profissi
 
 ## Architecture
 
-The project is structured following layered architecture:
+### The project is structured following layered architecture:
 
-controller → service → repository → database
+#### controller → service → repository → database
 
 ### Additional layers:
 - `dto` – data transfer objects for request/response separation
 - `exception` – centralized global error handling
 - `security` – authentication and authorization (JWT)
 - `specification` – dynamic query filtering (JPA Specifications)
-
+- `pagination` – standardized paginated API responses
 ---
 
 ## Security
@@ -74,12 +75,17 @@ controller → service → repository → database
 - Role-based authorization (ADMIN / USER)
 - Endpoint protection using `@PreAuthorize`
 - Multi-tenant filtering (users access only their own data)
+- Stateless authentication (no server-side sessions)
 
 ---
 
 ## Dashboard
 
 - `GET /dashboard/summary`
+- `GET /dashboard/summary?type=INCOME|EXPENSE`
+- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+- `GET /dashboard/summary?categoryId=UUID`
+- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&categoryId=UUID&type=INCOME|EXPENSE`
 
 ### Optional filters:
 
@@ -88,19 +94,29 @@ controller → service → repository → database
 - `endDate=YYYY-MM-DD`
 - `categoryId=UUID`
 
-### Example:
+### Example Request:
 
 #### GET /dashboard/summary?startDate=2026-01-01&endDate=2026-03-31&type=INCOME
 
-### Dashboard Example
+### Dashboard Example:
 
 ```json
 {
   "income": 5000.00,
-  "expense":   0.00,
-  "balance":5000.00
+  "expense":3000.00,
+  "balance":2000.00
 }
 ```
+
+### Dashboard Analytics:
+
+- `GET /dashboard/analytics?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+
+#### Returns financial insights including:
+
+- Current vs previous period comparison
+- Income, expense and balance growth (%)
+
 ---
 
 ## Main Endpoints
@@ -113,7 +129,10 @@ controller → service → repository → database
 ### Users
 - `POST /users`
 - `GET /users`
+- `PUT /users/{id}`
+- `PATCH /users/{id}/deactivate`
 
+> Note: User deletion is handled via deactivation (soft delete).
 ---
 
 ### Transactions
@@ -122,24 +141,21 @@ controller → service → repository → database
 - `PUT /transactions/{id}`
 - `DELETE /transactions/{id}`
 
----
+### Transactions (Pagination, Sorting & Filtering)
 
-### Dashboard
-- `GET /dashboard/summary`
-- `GET /dashboard/summary?type=INCOME|EXPENSE`
-- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
-- `GET /dashboard/summary?categoryId=UUID`
-- `GET /dashboard/summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD&categoryId=UUID&type=INCOME|EXPENSE`
+#### Query Parameters:
 
-### Dashboard Analytics
+- `page` (default: 0)
+- `size` (default: 10)
+- `sort=field,asc|desc` (e.g., `date,desc`)
+- `type=INCOME|EXPENSE`
 
-- `GET /dashboard/analytics?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+#### Examples Requests:
 
-#### Returns financial insights including:
-
-- Current vs previous period comparison
-- Income, expense and balance growth (%)
-
+- `GET /transactions?page=0&size=5`
+- `GET /transactions?sort=date,desc`
+- `GET /transactions?type=INCOME`
+- `GET /transactions?page=0&size=5&sort=amount,asc&type=EXPENSE`
 ---
 
 ## How to Run
@@ -182,10 +198,11 @@ spring:
 ---
 
 ## Future Improvements
-- Advanced dashboard analytics (charts, trends)
+- Advanced dashboard analytics (charts, trends, KPIs)
 - Redis caching for performance optimization
 - Docker containerization
 - CI/CD pipeline integration
 - Frontend integration (React or similar)
+- API rate limiting and monitoring
 
 
