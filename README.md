@@ -40,6 +40,9 @@
 - Pagination and sorting support (page, size, sort)
 - Secure REST endpoints with Spring Security
 - Global exception handling with standardized responses
+- Request validation with Jakarta Validation (@Valid)
+- Field-level error responses
+- Custom enum validation
 
 ---
 
