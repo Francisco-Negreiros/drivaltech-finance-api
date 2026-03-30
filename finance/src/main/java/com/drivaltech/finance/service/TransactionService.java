@@ -6,6 +6,7 @@ import com.drivaltech.finance.domain.TransactionType;
 import com.drivaltech.finance.dto.CreateTransactionRequest;
 import com.drivaltech.finance.dto.PaginationResponse;
 import com.drivaltech.finance.dto.TransactionResponse;
+import com.drivaltech.finance.exception.BusinessException;
 import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
@@ -201,10 +202,13 @@ public class TransactionService {
         com.drivaltech.finance.user.User user = getAuthenticatedUser();
 
         // Filtro por tipo (se existir)
-        com.drivaltech.finance.domain.TransactionType transactionType = null;
-
+        TransactionType transactionType = null;
         if (type != null) {
-            transactionType = com.drivaltech.finance.domain.TransactionType.valueOf(type);
+            try {
+                transactionType = TransactionType.valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException("Invalid transaction type: " + type);
+            }
         }
 
         // Query
