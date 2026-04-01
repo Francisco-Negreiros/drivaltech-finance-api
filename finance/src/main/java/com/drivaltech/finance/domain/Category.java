@@ -1,5 +1,6 @@
 package com.drivaltech.finance.domain;
 
+import com.drivaltech.finance.user.User;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -21,6 +22,10 @@ public class Category {
 
     private Boolean active = true;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Category() {
     }
 
@@ -36,9 +41,7 @@ public class Category {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    //public void setId(UUID id) {this.id = id;}
 
     public String getName() {
         return name;
@@ -71,6 +74,10 @@ public class Category {
     public void deactivate() {
         this.active = false;
     }
+
+    public User getUser() {return user;}
+
+    public void setUser(User user) {this.user = user;}
 
     // getters e setters
 }

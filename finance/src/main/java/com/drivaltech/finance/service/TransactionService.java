@@ -10,16 +10,20 @@ import com.drivaltech.finance.exception.BusinessException;
 import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
+import com.drivaltech.finance.repository.TransactionRepository;
 import com.drivaltech.finance.specification.TransactionSpecification;
 import com.drivaltech.finance.user.User;
 import com.drivaltech.finance.user.UserRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.drivaltech.finance.repository.TransactionRepository;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -30,6 +34,9 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(
             TransactionRepository transactionRepository,
@@ -43,26 +50,49 @@ public class TransactionService {
 
     public TransactionResponse create(CreateTransactionRequest request) {
 
+        User user = getAuthenticatedUser();
+
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Category not found with id: " + request.getCategoryId()));
 
-        Transaction transaction = new Transaction();
-        transaction.setDescription(request.getDescription());
-        transaction.setAmount(request.getAmount());
-        transaction.setDate(request.getDate());
-        transaction.setType(TransactionType.valueOf(request.getType()));
-        transaction.setCategory(category);
+        // Validação de ownership da categoria
+        if (!category.getUser().getId().equals(user.getId())) {
+            logger.warn("User {} tried to use category {} from another user",
+                    user.getId(), category.getId());
+            throw new ForbiddenException("You do not have permission to use this category");
+        }
 
-        User user = getAuthenticatedUser();
-        transaction.setUser(user);
+        try {
+            Transaction transaction = new Transaction();
+            transaction.setDescription(request.getDescription());
+            transaction.setAmount(request.getAmount());
+            transaction.setDate(request.getDate());
+            transaction.setType(TransactionType.valueOf(request.getType()));
+            transaction.setCategory(category);
+            transaction.setUser(user);
 
-        Transaction saved = transactionRepository.save(transaction);
+            logger.info("Creating transaction | userId={} | amount={} | type={}",
+                    user.getId(), request.getAmount(), request.getType());
 
-        return TransactionResponse.fromEntity(saved);
+            Transaction saved = transactionRepository.save(transaction);
+
+            logger.info("Transaction created successfully | id={}", saved.getId());
+
+            return TransactionResponse.fromEntity(saved);
+
+        } catch (Exception e) {
+            logger.error("Error creating transaction | userId={} | error={}",
+                    user.getId(), e.getMessage());
+            throw e;
+        }
     }
 
     public Page<TransactionResponse> findAll(Pageable pageable) {
+
+        User user = getAuthenticatedUser();
+
+        logger.info("Fetching all transactions | userId={}", user.getId());
 
         return transactionRepository
                 .findAll(pageable)
@@ -82,8 +112,12 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
+            logger.warn("Unauthorized access | userId={} | transactionId={}",
+                    user.getId(), id);
             throw new ForbiddenException("You do not have permission to access this transaction");
         }
+
+        logger.info("Fetching transaction | id={}", id);
 
         return TransactionResponse.fromEntity(transaction);
     }
@@ -100,6 +134,8 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
+            logger.warn("Unauthorized update attempt | userId={} | transactionId={}",
+                    user.getId(), id);
             throw new ForbiddenException("You do not have permission to update this transaction");
         }
 
@@ -107,15 +143,31 @@ public class TransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Category not found with id: " + request.getCategoryId()));
 
-        transaction.setDescription(request.getDescription());
-        transaction.setAmount(request.getAmount());
-        transaction.setDate(request.getDate());
-        transaction.setType(TransactionType.valueOf(request.getType()));
-        transaction.setCategory(category);
+        // Validação de ownership da categoria
+        if (!category.getUser().getId().equals(user.getId())) {
+            logger.warn("User {} tried to update transaction {} with foreign category {}",
+                    user.getId(), id, category.getId());
+            throw new ForbiddenException("You do not have permission to use this category");
+        }
 
-        transactionRepository.save(transaction);
+        try {
+            transaction.setDescription(request.getDescription());
+            transaction.setAmount(request.getAmount());
+            transaction.setDate(request.getDate());
+            transaction.setType(TransactionType.valueOf(request.getType()));
+            transaction.setCategory(category);
 
-        return TransactionResponse.fromEntity(transaction);
+            transactionRepository.save(transaction);
+
+            logger.info("Transaction updated | id={}", id);
+
+            return TransactionResponse.fromEntity(transaction);
+
+        } catch (Exception e) {
+            logger.error("Error updating transaction | id={} | error={}",
+                    id, e.getMessage());
+            throw e;
+        }
     }
 
     public void delete(UUID id) {
@@ -131,10 +183,22 @@ public class TransactionService {
         boolean isAdmin = user.getRole().name().equals("ADMIN");
 
         if (!isOwner && !isAdmin) {
+            logger.warn("Unauthorized delete attempt | userId={} | transactionId={}",
+                    user.getId(), id);
             throw new ForbiddenException("You do not have permission to delete this transaction");
         }
 
-        transactionRepository.delete(transaction);
+        try {
+            transactionRepository.delete(transaction);
+
+            logger.warn("Transaction deleted | id={} | userId={}",
+                    id, user.getId());
+
+        } catch (Exception e) {
+            logger.error("Error deleting transaction | id={} | error={}",
+                    id, e.getMessage());
+            throw e;
+        }
     }
 
     public Page<TransactionResponse> findAllWithFilters(
@@ -146,6 +210,8 @@ public class TransactionService {
     ) {
 
         User user = getAuthenticatedUser();
+
+        logger.info("Fetching transactions with filters | userId={}", user.getId());
 
         Specification<Transaction> spec =
                 TransactionSpecification.withFilters(
@@ -168,6 +234,7 @@ public class TransactionService {
 
         return authentication.getName();
     }
+
     private User getAuthenticatedUser() {
         String username = getLoggedUsername();
 
@@ -182,7 +249,6 @@ public class TransactionService {
             String type
     ) {
 
-        // Ordenação
         String sortField = sort[0];
         String sortDirection = sort.length > 1 ? sort[1] : "asc";
 
@@ -191,18 +257,16 @@ public class TransactionService {
                         ? org.springframework.data.domain.Sort.Direction.DESC
                         : org.springframework.data.domain.Sort.Direction.ASC;
 
-        org.springframework.data.domain.Pageable pageable =
-                org.springframework.data.domain.PageRequest.of(
-                        page,
-                        size,
-                        org.springframework.data.domain.Sort.by(direction, sortField)
-                );
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page,
+                size,
+                org.springframework.data.domain.Sort.by(direction, sortField)
+        );
 
-        // Usuário autenticado
-        com.drivaltech.finance.user.User user = getAuthenticatedUser();
+        User user = getAuthenticatedUser();
 
-        // Filtro por tipo (se existir)
         TransactionType transactionType = null;
+
         if (type != null) {
             try {
                 transactionType = TransactionType.valueOf(type.toUpperCase());
@@ -211,8 +275,7 @@ public class TransactionService {
             }
         }
 
-        // Query
-        org.springframework.data.domain.Page<com.drivaltech.finance.domain.Transaction> result;
+        Page<Transaction> result;
 
         if (transactionType != null) {
             result = transactionRepository.findByUserAndType(user, transactionType, pageable);
@@ -220,11 +283,8 @@ public class TransactionService {
             result = transactionRepository.findByUser(user, pageable);
         }
 
-        // Mapear para DTO
-        java.util.List<TransactionResponse> content = result
-                .stream()
-                .map(TransactionResponse::fromEntity)
-                .toList();
+        logger.info("Fetching paginated transactions | userId={} | page={} | size={}",
+                user.getId(), page, size);
 
         return new PaginationResponse<>(
                 result.map(TransactionResponse::fromEntity)
