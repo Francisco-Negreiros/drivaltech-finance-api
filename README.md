@@ -44,6 +44,21 @@
 - Field-level error responses
 - Custom enum validation
 
+### 🔍 Logging & Observability
+
+The API includes a logging interceptor to monitor all HTTP requests and responses.
+
+Features:
+- Logs HTTP method and endpoint
+- Tracks response status codes
+- Measures request execution time
+- Helps debugging and monitoring in development and production environments
+
+Example log:
+
+[REQUEST] POST /transactions  
+[RESPONSE] POST /transactions | status=201 | duration=73ms
+
 ---
 
 ## Tech Stack
