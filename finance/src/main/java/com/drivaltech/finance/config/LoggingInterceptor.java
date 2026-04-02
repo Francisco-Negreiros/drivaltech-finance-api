@@ -6,14 +6,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Override
     public boolean preHandle(
@@ -25,10 +24,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
         long startTime = System.currentTimeMillis();
         request.setAttribute("startTime", startTime);
 
-        String method = request.getMethod();
-        String uri = request.getRequestURI();
+        String correlationId = UUID.randomUUID().toString();
+        MDC.put("correlationId", correlationId);
 
-        logger.info("[REQUEST] {} {}", method, uri);
+        log.info("[REQUEST] {} {}", request.getMethod(), request.getRequestURI());
 
         return true;
     }
@@ -43,17 +42,26 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
         Long startTime = (Long) request.getAttribute("startTime");
 
-        if (startTime == null) {
-            return;
+        long duration = (startTime != null)
+                ? System.currentTimeMillis() - startTime
+                : 0;
+
+        String correlationId = MDC.get("correlationId");
+
+        log.info("[RESPONSE] {} {} | status={} | duration={}ms",
+                request.getMethod(),
+                request.getRequestURI(),
+                response.getStatus(),
+                duration);
+
+        if (ex != null) {
+            log.error("[ERROR] [{}] {} {}",
+                    correlationId,
+                    request.getMethod(),
+                    request.getRequestURI(),
+                    ex);
         }
 
-        long duration = System.currentTimeMillis() - startTime;
-
-        String method = request.getMethod();
-        String uri = request.getRequestURI();
-        int status = response.getStatus();
-
-        logger.info("[RESPONSE] {} {} | status={} | duration={}ms",
-                method, uri, status, duration);
+        MDC.clear();
     }
 }

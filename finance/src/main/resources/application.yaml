@@ -16,6 +16,9 @@ spring:
     show-sql: true
     open-in-view: false
 
-  logging:
-    level:
-      org.springframework.security: DEBUG
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%X{correlationId}] - %msg%n"
