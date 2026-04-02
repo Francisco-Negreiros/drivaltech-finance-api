@@ -28,15 +28,15 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-
-    private static final Logger logger =
-            LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(
             TransactionRepository transactionRepository,
@@ -56,14 +56,16 @@ public class TransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Category not found with id: " + request.getCategoryId()));
 
-        // Validação de ownership da categoria
         if (!category.getUser().getId().equals(user.getId())) {
-            logger.warn("User {} tried to use category {} from another user",
+            log.warn("Forbidden category usage | userId={} | categoryId={}",
                     user.getId(), category.getId());
             throw new ForbiddenException("You do not have permission to use this category");
         }
 
         try {
+            log.info("Creating transaction | userId={} | amount={} | type={}",
+                    user.getId(), request.getAmount(), request.getType());
+
             Transaction transaction = new Transaction();
             transaction.setDescription(request.getDescription());
             transaction.setAmount(request.getAmount());
@@ -72,18 +74,15 @@ public class TransactionService {
             transaction.setCategory(category);
             transaction.setUser(user);
 
-            logger.info("Creating transaction | userId={} | amount={} | type={}",
-                    user.getId(), request.getAmount(), request.getType());
-
             Transaction saved = transactionRepository.save(transaction);
 
-            logger.info("Transaction created successfully | id={}", saved.getId());
+            log.info("Transaction created | id={} | userId={}",
+                    saved.getId(), user.getId());
 
             return TransactionResponse.fromEntity(saved);
 
         } catch (Exception e) {
-            logger.error("Error creating transaction | userId={} | error={}",
-                    user.getId(), e.getMessage());
+            log.error("Error creating transaction | userId={}", user.getId(), e);
             throw e;
         }
     }
@@ -92,154 +91,11 @@ public class TransactionService {
 
         User user = getAuthenticatedUser();
 
-        logger.info("Fetching all transactions | userId={}", user.getId());
+        log.info("Fetching all transactions | userId={}", user.getId());
 
         return transactionRepository
                 .findAll(pageable)
                 .map(TransactionResponse::fromEntity);
-    }
-
-    public TransactionResponse findById(UUID id) {
-
-        User user = getAuthenticatedUser();
-
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Transaction not found with id: " + id)
-                );
-
-        boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
-
-        if (!isOwner && !isAdmin) {
-            logger.warn("Unauthorized access | userId={} | transactionId={}",
-                    user.getId(), id);
-            throw new ForbiddenException("You do not have permission to access this transaction");
-        }
-
-        logger.info("Fetching transaction | id={}", id);
-
-        return TransactionResponse.fromEntity(transaction);
-    }
-
-    public TransactionResponse update(UUID id, CreateTransactionRequest request) {
-
-        User user = getAuthenticatedUser();
-
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Transaction not found with id: " + id));
-
-        boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
-
-        if (!isOwner && !isAdmin) {
-            logger.warn("Unauthorized update attempt | userId={} | transactionId={}",
-                    user.getId(), id);
-            throw new ForbiddenException("You do not have permission to update this transaction");
-        }
-
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Category not found with id: " + request.getCategoryId()));
-
-        // Validação de ownership da categoria
-        if (!category.getUser().getId().equals(user.getId())) {
-            logger.warn("User {} tried to update transaction {} with foreign category {}",
-                    user.getId(), id, category.getId());
-            throw new ForbiddenException("You do not have permission to use this category");
-        }
-
-        try {
-            transaction.setDescription(request.getDescription());
-            transaction.setAmount(request.getAmount());
-            transaction.setDate(request.getDate());
-            transaction.setType(TransactionType.valueOf(request.getType()));
-            transaction.setCategory(category);
-
-            transactionRepository.save(transaction);
-
-            logger.info("Transaction updated | id={}", id);
-
-            return TransactionResponse.fromEntity(transaction);
-
-        } catch (Exception e) {
-            logger.error("Error updating transaction | id={} | error={}",
-                    id, e.getMessage());
-            throw e;
-        }
-    }
-
-    public void delete(UUID id) {
-
-        User user = getAuthenticatedUser();
-
-        Transaction transaction = transactionRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Transaction not found with id: " + id));
-
-        boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
-
-        if (!isOwner && !isAdmin) {
-            logger.warn("Unauthorized delete attempt | userId={} | transactionId={}",
-                    user.getId(), id);
-            throw new ForbiddenException("You do not have permission to delete this transaction");
-        }
-
-        try {
-            transactionRepository.delete(transaction);
-
-            logger.warn("Transaction deleted | id={} | userId={}",
-                    id, user.getId());
-
-        } catch (Exception e) {
-            logger.error("Error deleting transaction | id={} | error={}",
-                    id, e.getMessage());
-            throw e;
-        }
-    }
-
-    public Page<TransactionResponse> findAllWithFilters(
-            TransactionType type,
-            LocalDate startDate,
-            LocalDate endDate,
-            UUID categoryId,
-            Pageable pageable
-    ) {
-
-        User user = getAuthenticatedUser();
-
-        logger.info("Fetching transactions with filters | userId={}", user.getId());
-
-        Specification<Transaction> spec =
-                TransactionSpecification.withFilters(
-                        type,
-                        startDate,
-                        endDate,
-                        categoryId,
-                        user
-                );
-
-        Page<Transaction> page = transactionRepository.findAll(spec, pageable);
-
-        return page.map(TransactionResponse::fromEntity);
-    }
-
-    private String getLoggedUsername() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        return authentication.getName();
-    }
-
-    private User getAuthenticatedUser() {
-        String username = getLoggedUsername();
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public PaginationResponse<TransactionResponse> findAll(
@@ -283,11 +139,128 @@ public class TransactionService {
             result = transactionRepository.findByUser(user, pageable);
         }
 
-        logger.info("Fetching paginated transactions | userId={} | page={} | size={}",
+        log.info("Fetching paginated transactions | userId={} | page={} | size={}",
                 user.getId(), page, size);
 
         return new PaginationResponse<>(
                 result.map(TransactionResponse::fromEntity)
         );
+    }
+
+    public TransactionResponse findById(UUID id) {
+
+        User user = getAuthenticatedUser();
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Transaction not found with id: " + id)
+                );
+
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            log.warn("Unauthorized access | userId={} | transactionId={}",
+                    user.getId(), id);
+            throw new ForbiddenException("You do not have permission to access this transaction");
+        }
+
+        log.info("Fetching transaction | id={} | userId={}", id, user.getId());
+
+        return TransactionResponse.fromEntity(transaction);
+    }
+
+    public TransactionResponse update(UUID id, CreateTransactionRequest request) {
+
+        User user = getAuthenticatedUser();
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Transaction not found with id: " + id));
+
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            log.warn("Unauthorized update | userId={} | transactionId={}",
+                    user.getId(), id);
+            throw new ForbiddenException("You do not have permission to update this transaction");
+        }
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + request.getCategoryId()));
+
+        if (!category.getUser().getId().equals(user.getId())) {
+            log.warn("Forbidden category update | userId={} | transactionId={} | categoryId={}",
+                    user.getId(), id, category.getId());
+            throw new ForbiddenException("You do not have permission to use this category");
+        }
+
+        try {
+            log.info("Updating transaction | id={} | userId={}", id, user.getId());
+
+            transaction.setDescription(request.getDescription());
+            transaction.setAmount(request.getAmount());
+            transaction.setDate(request.getDate());
+            transaction.setType(TransactionType.valueOf(request.getType()));
+            transaction.setCategory(category);
+
+            transactionRepository.save(transaction);
+
+            log.info("Transaction updated | id={} | userId={}", id, user.getId());
+
+            return TransactionResponse.fromEntity(transaction);
+
+        } catch (Exception e) {
+            log.error("Error updating transaction | id={} | userId={}", id, user.getId(), e);
+            throw e;
+        }
+    }
+
+    public void delete(UUID id) {
+
+        User user = getAuthenticatedUser();
+
+        Transaction transaction = transactionRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Transaction not found with id: " + id));
+
+        boolean isOwner = transaction.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            log.warn("Unauthorized delete | userId={} | transactionId={}",
+                    user.getId(), id);
+            throw new ForbiddenException("You do not have permission to delete this transaction");
+        }
+
+        try {
+            log.info("Deleting transaction | id={} | userId={}", id, user.getId());
+
+            transactionRepository.delete(transaction);
+
+            log.warn("Transaction deleted | id={} | userId={}", id, user.getId());
+
+        } catch (Exception e) {
+            log.error("Error deleting transaction | id={} | userId={}", id, user.getId(), e);
+            throw e;
+        }
+    }
+
+    private String getLoggedUsername() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        return authentication.getName();
+    }
+
+    private User getAuthenticatedUser() {
+        String username = getLoggedUsername();
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
