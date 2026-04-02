@@ -44,21 +44,43 @@
 - Field-level error responses
 - Custom enum validation
 
-### 🔍 Logging & Observability
 
-The API includes a logging interceptor to monitor all HTTP requests and responses.
+### Logging & Observability
 
-Features:
+#### The API includes a logging interceptor to monitor all HTTP requests and responses.
+
+#### Features:
 - Logs HTTP method and endpoint
 - Tracks response status codes
 - Measures request execution time
 - Helps debugging and monitoring in development and production environments
 
-Example log:
+#### Example log:
 
-[REQUEST] POST /transactions  
-[RESPONSE] POST /transactions | status=201 | duration=73ms
+- [REQUEST] POST /transactions  
+- [RESPONSE] POST /transactions | status=201 | duration=73ms
 
+#### The API implements correlation ID logging to enable full request traceability.
+
+#### Correlation ID
+- Each request receives a unique identifier (UUID)
+- The ID is propagated across all logs using MDC (Mapped Diagnostic Context)
+- Allows tracking a request from start to finish
+
+#### Example Logs
+- [abc123] Creating transaction | userId=...
+- [abc123] Transaction created | id=...
+- [abc123] [RESPONSE] POST /transactions | status=201 | duration=120ms
+
+#### Implementation Details
+- LoggingInterceptor intercepts all HTTP requests
+- MDC stores correlationId per thread
+- Logging pattern configured in application.yaml
+
+#### Benefits
+- Improved debugging
+- Easier log filtering
+- Production-ready observability
 ---
 
 ## Tech Stack
