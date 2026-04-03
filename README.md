@@ -44,43 +44,43 @@
 - Field-level error responses
 - Custom enum validation
 
+---
 
-### Logging & Observability
+## Logging & Observability
 
-#### The API includes a logging interceptor to monitor all HTTP requests and responses.
+- The API implements advanced logging with full request traceability using correlation ID, user context, and client IP.
 
-#### Features:
-- Logs HTTP method and endpoint
-- Tracks response status codes
-- Measures request execution time
-- Helps debugging and monitoring in development and production environments
-
-#### Example log:
-
-- [REQUEST] POST /transactions  
-- [RESPONSE] POST /transactions | status=201 | duration=73ms
-
-#### The API implements correlation ID logging to enable full request traceability.
-
-#### Correlation ID
+- Correlation ID
 - Each request receives a unique identifier (UUID)
-- The ID is propagated across all logs using MDC (Mapped Diagnostic Context)
-- Allows tracking a request from start to finish
+- Propagated across all logs using MDC
 
-#### Example Logs
-- [abc123] Creating transaction | userId=...
-- [abc123] Transaction created | id=...
-- [abc123] [RESPONSE] POST /transactions | status=201 | duration=120ms
+### User Context
+- Authenticated username is extracted from Spring Security
+- Automatically included in all logs via MDC
 
-#### Implementation Details
-- LoggingInterceptor intercepts all HTTP requests
-- MDC stores correlationId per thread
+### Client IP
+- Captured from HttpServletRequest
+- Supports X-Forwarded-For for proxy environments
+
+### Example Logs
+- [a37bee74...] [user=valter] [ip=127.0.0.1] - [REQUEST] POST /transactions
+- [a37bee74...] [user=valter] [ip=127.0.0.1] - Creating transaction ...
+- [a37bee74...] [user=valter] [ip=127.0.0.1] - [RESPONSE] POST /transactions | status=201 | duration=311ms
+
+### Implementation Details
+- LoggingInterceptor handles request lifecycle
+- MDC (Mapped Diagnostic Context) stores:
+  - correlationId
+  - username
+  - ip
 - Logging pattern configured in application.yaml
 
-#### Benefits
-- Improved debugging
-- Easier log filtering
+### Benefits
+- Full traceability (request → user → origin)
+- Easier debugging in concurrent environments
 - Production-ready observability
+- Improved monitoring and auditing capabilities
+
 ---
 
 ## Tech Stack
@@ -238,11 +238,29 @@ spring:
 ---
 
 ## Future Improvements
-- Advanced dashboard analytics (charts, trends, KPIs)
-- Redis caching for performance optimization
+### Observability & Monitoring
+- Audit trail (user action history)
+- Structured logging (JSON format)
+- Integration with monitoring tools (ELK Stack / Grafana)
+- Correlation ID propagation across services (microservices readiness)
+
+### Performance & Scalability
+- Redis caching for frequently accessed data
+- API rate limiting and throttling
+- Database query optimization
+
+### Testing & Quality
+- Unit tests with JUnit and Mockito
+- Integration tests for REST endpoints
+- Test coverage reporting
+
+### DevOps & Deployment
 - Docker containerization
 - CI/CD pipeline integration
+- Environment-based configuration (dev/staging/prod)
+
+### Product Evolution
+- Advanced dashboard analytics (charts, trends, KPIs)
 - Frontend integration (React or similar)
-- API rate limiting and monitoring
 
 
