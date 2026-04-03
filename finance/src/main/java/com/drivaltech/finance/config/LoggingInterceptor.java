@@ -3,6 +3,8 @@ package com.drivaltech.finance.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -26,6 +28,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
         String correlationId = UUID.randomUUID().toString();
         MDC.put("correlationId", correlationId);
+
+        String username = getUsername();
+        MDC.put("username", username);
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getRemoteAddr();
+        }
+        MDC.put("ip", ip);
 
         log.info("[REQUEST] {} {}", request.getMethod(), request.getRequestURI());
 
@@ -63,5 +74,16 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
 
         MDC.clear();
+    }
+    private String getUsername() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "anonymous";
+        }
+
+        return authentication.getName();
     }
 }
