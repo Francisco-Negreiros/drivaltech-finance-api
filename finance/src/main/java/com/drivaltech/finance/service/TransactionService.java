@@ -15,6 +15,7 @@ import com.drivaltech.finance.specification.TransactionSpecification;
 import com.drivaltech.finance.user.User;
 import com.drivaltech.finance.user.UserRepository;
 
+import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,15 +38,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             CategoryRepository categoryRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            AuditService auditService) {
 
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.auditService = auditService;
     }
 
     public TransactionResponse create(CreateTransactionRequest request) {
@@ -75,6 +79,18 @@ public class TransactionService {
             transaction.setUser(user);
 
             Transaction saved = transactionRepository.save(transaction);
+
+            try {
+                auditService.log(
+                        user.getId(),
+                        "CREATED",
+                        "TRANSACTION",
+                        saved.getId(),
+                        MDC.get("ip")
+                );
+            } catch (Exception e) {
+                log.error("Audit log failed | error={}", e.getMessage());
+            }
 
             log.info("Transaction created | id={} | userId={}",
                     saved.getId(), user.getId());
@@ -208,6 +224,18 @@ public class TransactionService {
 
             transactionRepository.save(transaction);
 
+            try {
+                auditService.log(
+                        user.getId(),
+                        "UPDATED",
+                        "TRANSACTION",
+                        transaction.getId(),
+                        MDC.get("ip")
+                );
+            } catch (Exception e) {
+                log.error("Audit log failed | error={}", e.getMessage());
+            }
+
             log.info("Transaction updated | id={} | userId={}", id, user.getId());
 
             return TransactionResponse.fromEntity(transaction);
@@ -240,6 +268,18 @@ public class TransactionService {
             log.info("Deleting transaction | id={} | userId={}", id, user.getId());
 
             transactionRepository.delete(transaction);
+
+            try {
+                auditService.log(
+                        user.getId(),
+                        "DELETED",
+                        "TRANSACTION",
+                        id,
+                        MDC.get("ip")
+                );
+            } catch (Exception e) {
+                log.error("Audit log failed | error={}", e.getMessage());
+            }
 
             log.warn("Transaction deleted | id={} | userId={}", id, user.getId());
 
