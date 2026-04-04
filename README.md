@@ -83,6 +83,36 @@
 
 ---
 
+## Audit Trail
+
+- The API implements a persistent audit trail system to track user actions on key resources.
+
+### What is recorded
+- User ID
+- Action performed (CREATE, UPDATE, DELETE)
+- Resource affected (e.g., TRANSACTION)
+- Resource ID
+- Client IP address
+- Timestamp
+
+### Example Records
+- User f7903d46... CREATED TRANSACTION bd040272...
+- User f7903d46... DELETED TRANSACTION 123...
+
+### Implementation Details
+- Audit logs are stored in tb_audit_log
+- AuditService centralizes audit logic
+- Logging is non-blocking (fail-safe with try/catch)
+- Timestamp is automatically generated using @PrePersist
+
+### Benefits
+- Full traceability of user actions
+- Improved debugging and monitoring
+- Foundation for compliance and auditing
+- Production-ready backend pattern
+
+---
+
 ## Tech Stack
 
 - Java 17+
