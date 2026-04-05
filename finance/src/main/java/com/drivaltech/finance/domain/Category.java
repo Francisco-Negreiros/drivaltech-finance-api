@@ -79,6 +79,10 @@ public class Category {
 
     public void setUser(User user) {this.user = user;}
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     // getters e setters
 }
 

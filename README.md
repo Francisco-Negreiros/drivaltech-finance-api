@@ -168,6 +168,9 @@ When the limit is exceeded:
   "message": "Rate limit exceeded. Try again later."
 }
 ```
+### Purpose
+
+#### This mechanism helps protect the API against abuse, brute force attempts, and excessive usage,ensuring system stability and fair usage.
 
 ## Dashboard
 
@@ -290,16 +293,35 @@ spring:
 ./mvnw spring-boot:run
 ```
 ---
-   
+
 ## Testing
 
-### You can test the API using:
+### The project includes unit tests to ensure business rule correctness and system reliability.
 
-- Postman or Insomnia for manual testing
-- REST clients with JWT authentication
+### Covered scenarios:
 
-### Automated tests (JUnit & Mockito) are planned for future implementation.
+- Transaction creation (success case)
+- Authorization validation (multi-tenant rules)
+- Forbidden operations (accessing чуж data)
+- Update and delete validations
+- Edge cases and invalid inputs
 
+### Tools used:
+
+- JUnit 5
+- Mockito
+
+### Key points:
+
+- SecurityContext is mocked to simulate authenticated users
+- Repository interactions are isolated using mocks
+- Audit logging is designed as fail-safe (does not break main flow)
+
+### How to run tests:
+
+```bash
+./mvnw test
+```
 ---
 
 ## Author
