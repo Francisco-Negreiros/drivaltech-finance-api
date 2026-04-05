@@ -13,38 +13,65 @@
 ### The project follows clean architecture principles and focuses on best practices used in real backend systems.
 
 ---
+## Tech Stack
 
-## Visão Geral
+- Java 17+
+- Spring Boot
+- Spring Security
+- JWT Authentication
+- Spring Data JPA
+- PostgreSQL
+- Maven
+---
 
-### Esta é uma API de gerenciamento financeiro desenvolvida com Spring Boot, simulando cenários reais de backend, como:
+## Architecture
 
-- Autenticação e autorização com JWT
-- Controle de acesso por perfil (ADMIN / USER)
-- Isolamento de dados por usuário (multi-tenant)
-- Gerenciamento de transações
-- Resumo financeiro (receita, despesa e saldo)
+### The project is structured following layered architecture:
 
-### O projeto segue boas práticas de arquitetura e desenvolvimento backend profissional.
+#### controller → service → repository → database
+
+### Additional layers:
+- `dto` – data transfer objects for request/response separation
+- `exception` – centralized global error handling
+- `security` – authentication and authorization (JWT)
+- `specification` – dynamic query filtering (JPA Specifications)
+- `pagination` – standardized paginated API responses
 
 ---
 
 ## Features
 
+### Security
 - JWT-based authentication and authorization
 - Role-based access control (ADMIN / USER)
-- Multi-tenant data isolation (user-specific data access)
-- Full CRUD for transactions with pagination, sorting and filtering
-- Category management (CRUD)
-- Dashboard financial summary (income, expense, balance)
-- Dynamic filtering (date range, category, transaction type)
-- Pagination and sorting support (page, size, sort)
-- Secure REST endpoints with Spring Security
-- Global exception handling with standardized responses
-- Request validation with Jakarta Validation (@Valid)
-- Field-level error responses
+- Multi-tenant data isolation
+
+### Transactions
+- Full CRUD operations
+- Pagination, sorting, and filtering
+- Category association
+
+### Dashboard
+- Financial summary (income, expense, balance)
+- Dynamic filters (date range, category, type)
+
+### Infrastructure
+- Global exception handling
+- Request validation (@Valid)
+- Standardized error responses
 - Custom enum validation
 
 ---
+
+## Security
+
+- JWT-based authentication
+- Role-based authorization (ADMIN / USER)
+- Endpoint protection using `@PreAuthorize`
+- Multi-tenant filtering (users access only their own data)
+- Stateless authentication (no server-side sessions)
+
+--- 
 
 ## Logging & Observability
 
@@ -111,43 +138,36 @@
 - Foundation for compliance and auditing
 - Production-ready backend pattern
 
----
+--- 
+## Rate Limiting
 
-## Tech Stack
+To protect the API from excessive usage and abuse, a rate limiting mechanism has been implemented.
 
-- Java 17+
-- Spring Boot
-- Spring Security
-- JWT Authentication
-- Spring Data JPA
-- PostgreSQL
-- Maven
+### Configuration
 
----
+```yaml
+rate-limit:
+  max-requests: 5
+  time-window: 60000
+```
 
-## Architecture
+* **max-requests**: Maximum number of requests allowed
+* **time-window**: Time window in milliseconds
 
-### The project is structured following layered architecture:
+### Behavior
 
-#### controller → service → repository → database
+When the limit is exceeded:
 
-### Additional layers:
-- `dto` – data transfer objects for request/response separation
-- `exception` – centralized global error handling
-- `security` – authentication and authorization (JWT)
-- `specification` – dynamic query filtering (JPA Specifications)
-- `pagination` – standardized paginated API responses
----
+* The API returns **HTTP 429 - Too Many Requests**
+* A standardized JSON response is returned:
 
-## Security
-
-- JWT-based authentication
-- Role-based authorization (ADMIN / USER)
-- Endpoint protection using `@PreAuthorize`
-- Multi-tenant filtering (users access only their own data)
-- Stateless authentication (no server-side sessions)
-
----
+```json
+{
+  "status": 429,
+  "error": "Too Many Requests",
+  "message": "Rate limit exceeded. Try again later."
+}
+```
 
 ## Dashboard
 
@@ -187,6 +207,17 @@
 - Current vs previous period comparison
 - Income, expense and balance growth (%)
 
+### Logging
+
+Blocked requests are logged with:
+
+* IP address
+* Request count
+
+Example:
+```
+Rate limit exceeded | ip=127.0.0.1 | count=6
+```
 ---
 
 ## Main Endpoints
@@ -226,6 +257,7 @@
 - `GET /transactions?sort=date,desc`
 - `GET /transactions?type=INCOME`
 - `GET /transactions?page=0&size=5&sort=amount,asc&type=EXPENSE`
+
 ---
 
 ## How to Run
@@ -247,36 +279,44 @@ spring:
     password: your_password
 ```
 ### 3. Run the project:
-###   ./mvnw spring-boot:run
+### Requirements
 
+- Java 17+
+- PostgreSQL
+
+### Run
+
+```bash
+./mvnw spring-boot:run
+```
 ---
    
 ## Testing
 
 ### You can test the API using:
 
-### Postman   
-### Insomnia
+- Postman or Insomnia for manual testing
+- REST clients with JWT authentication
+
+### Automated tests (JUnit & Mockito) are planned for future implementation.
 
 ---
 
 ## Author
 
 ## Valter
-### Backend Developer in progress 
+### Backend Developer (Java & Spring Boot)
 
 ---
 
 ## Future Improvements
+
 ### Observability & Monitoring
-- Audit trail (user action history)
-- Structured logging (JSON format)
 - Integration with monitoring tools (ELK Stack / Grafana)
 - Correlation ID propagation across services (microservices readiness)
 
 ### Performance & Scalability
 - Redis caching for frequently accessed data
-- API rate limiting and throttling
 - Database query optimization
 
 ### Testing & Quality
