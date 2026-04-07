@@ -1,14 +1,18 @@
 package com.drivaltech.finance.dto;
 
+import java.io.Serializable;
+
 import java.math.BigDecimal;
 
-public class DashboardSummaryResponse {
+public class DashboardSummaryResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private BigDecimal income;
     private BigDecimal expense;
     private BigDecimal balance;
 
-    public DashboardSummaryResponse(
+    public DashboardSummaryResponse (
             BigDecimal income,
             BigDecimal expense,
             BigDecimal balance) {

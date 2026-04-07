@@ -7,6 +7,12 @@ spring:
     username: postgres
     password: BdP0sTgRsS@L2026
 
+  data:
+
+    redis:
+      host: host.docker.internal
+      port: 6379
+
   jpa:
     hibernate:
       ddl-auto: update
