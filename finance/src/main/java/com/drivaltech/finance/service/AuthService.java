@@ -20,6 +20,11 @@ public class AuthService {
                 .getContext()
                 .getAuthentication();
 
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new RuntimeException("User not authenticated");
+        }
+
         String username = authentication.getName();
 
         return userRepository.findByUsername(username)

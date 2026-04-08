@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getServletPath();
+        System.out.println("PATH: " + path);
 
         if (path.startsWith("/auth") || path.startsWith("/users")) {
             filterChain.doFilter(request, response);
@@ -41,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String authHeader = request.getHeader("Authorization");
+        System.out.println("AUTH HEADER: " + authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -48,8 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
+        System.out.println("TOKEN: " + token);
 
         String username = jwtService.extractUsername(token);
+        System.out.println("USERNAME: " + username);
 
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -57,7 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(token, userDetails)) {
+            boolean isValid = jwtService.isTokenValid(token, userDetails);
+            System.out.println("VALID TOKEN: " + isValid);
+
+            if (isValid) {
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(

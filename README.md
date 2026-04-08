@@ -24,6 +24,64 @@
 - Maven
 ---
 
+## Redis Caching
+
+### Overview
+
+#### This project uses Redis as a distributed cache to improve performance of the dashboard summary endpoint.
+
+### Configuration
+
+```
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+```
+### Running Redis with Docker
+```
+docker run -d -p 6379:6379 redis
+```
+### Cache Strategy
+- The endpoint /dashboard/summary is cached using Spring Cache
+- Cache is based on:
+  - method parameters
+  - authenticated user ID
+
+Example:
+```
+dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
+```
+### Cache Isolation
+
+#### Each user has its own cache entry, preventing data leakage between users.
+
+### Cache Eviction
+
+#### Cache is automatically invalidated when:
+
+- transaction is created
+- transaction is updated
+- transaction is deleted
+
+#### Handled via:
+```
+@CacheEvict(value = "dashboard", allEntries = true)
+```
+
+### Benefits
+- Faster responses for repeated requests
+- Reduced database load
+- Better scalability
+
+### Notes
+
+- Ensure Redis is running before starting the application
+- Default serialization uses Java serialization (Serializable)
+- For production, consider using JSON serialization (Jackson)
+
+---
 ## Architecture
 
 ### The project is structured following layered architecture:
@@ -336,9 +394,11 @@ spring:
 ### Observability & Monitoring
 - Integration with monitoring tools (ELK Stack / Grafana)
 - Correlation ID propagation across services (microservices readiness)
+- Cache metrics monitoring (hit/miss rate)
 
 ### Performance & Scalability
-- Redis caching for frequently accessed data
+- Implement cache TTL (expiration strategy)
+- Improve cache key design and granularity
 - Database query optimization
 
 ### Testing & Quality

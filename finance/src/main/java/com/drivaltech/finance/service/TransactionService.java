@@ -11,22 +11,18 @@ import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
 import com.drivaltech.finance.repository.TransactionRepository;
-import com.drivaltech.finance.specification.TransactionSpecification;
 import com.drivaltech.finance.user.User;
 import com.drivaltech.finance.user.UserRepository;
 
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +47,7 @@ public class TransactionService {
         this.userRepository = userRepository;
         this.auditService = auditService;
     }
-
+    @CacheEvict(value = "dashboard", allEntries = true)
     public TransactionResponse create(CreateTransactionRequest request) {
 
         User user = getAuthenticatedUser();
@@ -185,7 +181,7 @@ public class TransactionService {
 
         return TransactionResponse.fromEntity(transaction);
     }
-
+    @CacheEvict(value = "dashboard", allEntries = true)
     public TransactionResponse update(UUID id, CreateTransactionRequest request) {
 
         User user = getAuthenticatedUser();
@@ -245,7 +241,7 @@ public class TransactionService {
             throw e;
         }
     }
-
+    @CacheEvict(value = "dashboard", allEntries = true)
     public void delete(UUID id) {
 
         User user = getAuthenticatedUser();

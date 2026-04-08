@@ -5,6 +5,8 @@ import com.drivaltech.finance.dto.DashboardSummaryResponse;
 import com.drivaltech.finance.exception.BusinessException;
 import com.drivaltech.finance.repository.TransactionRepository;
 import com.drivaltech.finance.user.User;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.drivaltech.finance.service.AuthService;
 
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class DashboardService {
 
@@ -24,12 +27,17 @@ public class DashboardService {
         this.authService = authService;
     }
 
+    @Cacheable(
+            value = "dashboard",
+            key = "#root.methodName + '_' + #startDate + '_' + #endDate + '_' + #type + '_' + #categoryId + '_' + @authService.getAuthenticatedUser().id"
+    )
     public DashboardSummaryResponse getSummary(
             LocalDate startDate,
             LocalDate endDate,
             UUID categoryId,
             String type) {
 
+        log.info("Calculating dashboard summary...");
         User user = authService.getAuthenticatedUser();
 
         // Validação profissional do type
