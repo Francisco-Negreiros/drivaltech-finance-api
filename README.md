@@ -97,7 +97,7 @@ dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 
 ---
 
-## Features
+## Implemented Features
 
 ### Security
 - JWT-based authentication and authorization
@@ -118,6 +118,7 @@ dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 - Request validation (@Valid)
 - Standardized error responses
 - Custom enum validation
+- Redis caching for frequently accessed data (dashboard summary optimization)
 
 ---
 
@@ -175,6 +176,93 @@ dashboard::getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 - Faster response times
 - Reduced database load
 - Improved scalability
+
+---
+
+## Observability & Metrics
+
+#### The API implements production-level observability using Spring Boot Actuator and Micrometer.
+
+### Health Check
+
+#### Endpoint:
+```
+GET /actuator/health
+```
+
+### Provides detailed application status, including:
+
+- Database (PostgreSQL)
+- Redis
+- Disk space
+- SSL
+
+#### Example:
+
+```
+{
+"status": "UP"
+}
+```
+
+### Metrics
+
+#### Endpoint:
+
+```
+GET /actuator/metrics
+```
+
+#### Provides a list of available metrics such as:
+
+- JVM memory and GC
+- CPU usage
+- Database connection pool (HikariCP)
+- HTTP request metrics
+- Spring Security metrics
+
+### HTTP Metrics
+
+#### Endpoint:
+
+```
+GET /actuator/metrics/http.server.requests
+```
+
+#### Tracks:
+
+- Request count
+- Response time
+- HTTP status codes
+- Endpoint usage
+
+#### Example insights:
+
+- Performance per endpoint
+- Error rate monitoring
+- Request distribution
+
+
+
+### Prometheus Integration (Ready)
+
+#### Endpoint:
+
+```
+GET /actuator/prometheus
+```
+
+#### Exposes metrics in a format compatible with Prometheus.
+
+
+
+### Observability Capabilities
+
+- Real-time health monitoring
+- Performance tracking
+- Error analysis
+- Infrastructure visibility
+- Ready for dashboards and alerting (Grafana + Prometheus)
 
 ---
 ## Logging & Observability
@@ -438,14 +526,16 @@ spring:
 ## Future Improvements
 
 ### Observability & Monitoring
-- Integration with monitoring tools (ELK Stack / Grafana)
+- Integration with Grafana dashboards (via Prometheus)
+- Centralized logging with ELK Stack (Elasticsearch, Logstash, Kibana)
 - Correlation ID propagation across services (microservices readiness)
 - Cache metrics monitoring (hit/miss rate)
+- Distributed tracing (OpenTelemetry)
 
 ### Performance & Scalability
-- Implement cache TTL (expiration strategy)
-- Redis caching for frequently accessed data (implemented with TTL and invalidation)
-- Database query optimization
+- Cache TTL and eviction strategies
+- Database query optimization and indexing
+- Horizontal scalability (load balancing ready)
 
 ### Testing & Quality
 - Unit tests with JUnit and Mockito
@@ -453,7 +543,7 @@ spring:
 - Test coverage reporting
 
 ### DevOps & Deployment
-- Docker containerization
+- Docker containerization (API + Redis + Prometheus + Grafana)
 - CI/CD pipeline integration
 - Environment-based configuration (dev/staging/prod)
 
