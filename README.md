@@ -49,7 +49,7 @@ docker run -d -p 6379:6379 redis
   - method parameters
   - authenticated user ID
 
-Example:
+#### Example:
 ```
 dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 ```
@@ -131,6 +131,52 @@ dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 
 --- 
 
+## Caching Strategy (Redis)
+
+#### The application uses Redis as a caching layer to improve performance and reduce database load.
+
+### Dashboard Caching
+
+#### The endpoint `/dashboard/summary` is cached using Spring Cache abstraction.
+
+### Cache Key Structure
+
+#### Cache keys are composed of:
+
+- method name
+- request parameters (startDate, endDate, categoryId, type)
+- authenticated user ID
+
+#### Example:
+
+```
+dashboard::getSummary_2026-04-01_2026-04-30_null_INCOME_userId
+```
+
+### TTL (Time-To-Live)
+
+- Cache entries expire automatically after **5 minutes**
+- Prevents stale data and ensures periodic refresh
+
+### Cache Invalidation
+
+#### Cache is automatically cleared when transactions are modified:
+
+- Create transaction
+- Update transaction
+- Delete transaction
+
+#### Implemented using:
+
+```
+@CacheEvict(value = "dashboard", allEntries = true)
+```
+### Benefits
+- Faster response times
+- Reduced database load
+- Improved scalability
+
+---
 ## Logging & Observability
 
 - The API implements advanced logging with full request traceability using correlation ID, user context, and client IP.
@@ -199,7 +245,7 @@ dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 --- 
 ## Rate Limiting
 
-To protect the API from excessive usage and abuse, a rate limiting mechanism has been implemented.
+#### To protect the API from excessive usage and abuse, a rate limiting mechanism has been implemented.
 
 ### Configuration
 
@@ -214,7 +260,7 @@ rate-limit:
 
 ### Behavior
 
-When the limit is exceeded:
+#### When the limit is exceeded:
 
 * The API returns **HTTP 429 - Too Many Requests**
 * A standardized JSON response is returned:
@@ -270,12 +316,12 @@ When the limit is exceeded:
 
 ### Logging
 
-Blocked requests are logged with:
+#### Blocked requests are logged with:
 
 * IP address
 * Request count
 
-Example:
+#### Example:
 ```
 Rate limit exceeded | ip=127.0.0.1 | count=6
 ```
@@ -398,7 +444,7 @@ spring:
 
 ### Performance & Scalability
 - Implement cache TTL (expiration strategy)
-- Improve cache key design and granularity
+- Redis caching for frequently accessed data (implemented with TTL and invalidation)
 - Database query optimization
 
 ### Testing & Quality
