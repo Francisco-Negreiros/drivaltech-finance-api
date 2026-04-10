@@ -29,15 +29,15 @@ public class SecurityConfig {
             DaoAuthenticationProvider authenticationProvider) throws Exception {
 
         http
-                // ❌ desabilita CSRF (API REST)
+                // desabilita CSRF (API REST)
                 .csrf(csrf -> csrf.disable())
 
-                // 🔥 IMPORTANTE: API stateless (JWT)
+                // IMPORTANTE: API stateless (JWT)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 🔥 CORREÇÃO DO 403 → agora retorna 401 corretamente
+                // CORREÇÃO DO 403 → agora retorna 401 corretamente
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/dashboard/**").authenticated()
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
 

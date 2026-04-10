@@ -118,7 +118,69 @@ dashboard_getSummary_2026-04-01_2026-04-30_null_INCOME_userId
 - Request validation (@Valid)
 - Standardized error responses
 - Custom enum validation
-- Redis caching for frequently accessed data (dashboard summary optimization)
+- Redis caching for frequently accessed data
+- Metrics and monitoring with Prometheus and Grafana
+
+---
+
+## Observability
+
+### Metrics Exposure
+#### The API exposes metrics via:
+
+```
+GET /actuator/prometheus
+```
+
+#### Metrics are collected using Micrometer and include:
+- HTTP requests (count, latency, errors)
+- JVM metrics
+- Database connection metrics
+- Cache metrics (Redis)
+
+### Prometheus
+
+#### Prometheus is used to scrape and store application metrics.
+
+#### Run with Docker:
+```
+docker run -d -p 9090:9090 \
+-v ./prometheus:/etc/prometheus \
+prom/prometheus
+```
+
+#### Access:
+
+```
+http://localhost:9090
+```
+
+### Grafana
+
+#### Grafana is used for metrics visualization.
+
+#### Run with Docker:
+
+```
+docker run -d -p 3000:3000 --name grafana grafana/grafana
+```
+
+#### Access:
+
+```
+http://localhost:3000
+```
+- Default credentials:
+- admin / admin
+
+### Dashboard
+
+#### The observability dashboard includes:
+
+- Throughput (requests per second)
+- Latency (average response time)
+- Error rate (HTTP 5xx)
+- Top endpoints (most accessed routes)
 
 ---
 
@@ -526,11 +588,11 @@ spring:
 ## Future Improvements
 
 ### Observability & Monitoring
-- Integration with Grafana dashboards (via Prometheus)
-- Centralized logging with ELK Stack (Elasticsearch, Logstash, Kibana)
-- Correlation ID propagation across services (microservices readiness)
-- Cache metrics monitoring (hit/miss rate)
+- Alerting with Prometheus (rules)
+- Grafana alerts and notifications
 - Distributed tracing (OpenTelemetry)
+- Integration with ELK Stack (logs centralization)
+- SLA/SLO monitoring
 
 ### Performance & Scalability
 - Cache TTL and eviction strategies
