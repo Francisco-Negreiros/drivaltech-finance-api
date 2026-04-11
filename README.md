@@ -192,6 +192,21 @@ http://localhost:3000
 - Multi-tenant filtering (users access only their own data)
 - Stateless authentication (no server-side sessions)
 
+### JWT Configuration
+
+#### JWT settings are externalized via `application.yaml`:
+
+```
+jwt:
+  secret: your-secret-key
+  expiration: 3600000
+```
+
+- secret: signing key used to generate and validate tokens
+- expiration: token validity time in milliseconds
+
+#### This allows environment-based configuration (dev, staging, production).
+
 --- 
 
 ## Caching Strategy (Redis)
@@ -588,29 +603,34 @@ spring:
 ## Future Improvements
 
 ### Observability & Monitoring
-- Alerting with Prometheus (rules)
-- Grafana alerts and notifications
-- Distributed tracing (OpenTelemetry)
-- Integration with ELK Stack (logs centralization)
-- SLA/SLO monitoring
+- Alerting with Prometheus (custom rules and thresholds)
+- Grafana dashboards with alerts and notifications
+- Distributed tracing with OpenTelemetry (end-to-end request tracking)
+- Centralized logging with ELK Stack (Elasticsearch, Logstash, Kibana)
+- SLA/SLO monitoring and error budget tracking
 
 ### Performance & Scalability
-- Cache TTL and eviction strategies
-- Database query optimization and indexing
-- Horizontal scalability (load balancing ready)
+- Cache TTL and eviction strategies (Redis)
+- Database query optimization and indexing strategies
+- Horizontal scalability (stateless API + load balancing ready)
+- Connection pool tuning (HikariCP)
 
 ### Testing & Quality
 - Unit tests with JUnit and Mockito
 - Integration tests for REST endpoints
-- Test coverage reporting
+- Test coverage reporting (JaCoCo)
+- Testcontainers for integration testing with real dependencies
 
 ### DevOps & Deployment
 - Docker containerization (API + Redis + Prometheus + Grafana)
+- Docker Compose for local environment orchestration
 - CI/CD pipeline integration
 - Environment-based configuration (dev/staging/prod)
 
 ### Product Evolution
 - Advanced dashboard analytics (charts, trends, KPIs)
 - Frontend integration (React or similar)
+- Multi-user financial insights and reports
+- Export features (CSV/PDF reports)
 
 
