@@ -7,11 +7,13 @@ import com.drivaltech.finance.repository.CategoryRepository;
 import com.drivaltech.finance.repository.TransactionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 //@Configuration
+@Profile("dev")
 public class DataTestConfig implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;

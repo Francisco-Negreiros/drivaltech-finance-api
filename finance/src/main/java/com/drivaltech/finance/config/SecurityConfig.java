@@ -49,11 +49,14 @@ public class SecurityConfig {
 
                 // Regras de acesso
                 .authorizeHttpRequests(auth -> auth
+                        // public endpoints
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/users").permitAll()
+                        .requestMatchers("/users/**").authenticated()
+                        .requestMatchers("/actuator/**").permitAll()
+                        // protected endpoints
                         .requestMatchers("/dashboard/**").authenticated()
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+                        // fallback
                         .anyRequest().authenticated()
                 )
 
