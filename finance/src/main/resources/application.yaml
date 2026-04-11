@@ -2,13 +2,15 @@ spring:
   application:
     name: drivaltech-finance-api
 
+  profiles:
+    active: dev
+
   datasource:
     url: jdbc:postgresql://localhost:5432/drivaltech
     username: postgres
     password: BdP0sTgRsS@L2026
 
   data:
-
     redis:
       host: host.docker.internal
       port: 6379
