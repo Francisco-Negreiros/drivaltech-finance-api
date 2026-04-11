@@ -24,6 +24,10 @@ spring:
     show-sql: true
     open-in-view: false
 
+jwt:
+   secret: drivaltech-super-secret-key-drivaltech-super-secret
+   expiration: 3600000
+
 logging:
   level:
     org.springframework.security: DEBUG
