@@ -186,11 +186,53 @@ http://localhost:3000
 
 ## Security
 
-- JWT-based authentication
-- Role-based authorization (ADMIN / USER)
-- Endpoint protection using `@PreAuthorize`
-- Multi-tenant filtering (users access only their own data)
-- Stateless authentication (no server-side sessions)
+#### The API uses JWT-based authentication with role-based authorization, following a stateless architecture.
+
+### Authentication Flow
+- User logs in via /auth/login
+- Server returns a JWT token
+- Token must be sent in requests:
+
+```
+- Authorization: Bearer <token>
+```
+### JWT Structure
+
+#### Example payload:
+
+```
+{
+"sub": "valter",
+"roles": ["ROLE_USER"],
+"iat": 1710000000,
+"exp": 1710003600
+}
+```
+
+### Authorization
+- Role-based access control using @PreAuthorize
+- Roles follow Spring Security convention:
+
+```
+ROLE_USER
+ROLE_ADMIN
+```
+
+#### Example:
+```
+@PreAuthorize("hasAnyRole('ADMIN','USER')")
+```
+
+### Performance
+- Authorization is fully stateless
+- No database calls required for role validation
+- Roles are extracted directly from JWT
+
+### Benefits
+- Improved performance
+- Scalable architecture
+- Production-ready security model
+
 
 ### JWT Configuration
 
