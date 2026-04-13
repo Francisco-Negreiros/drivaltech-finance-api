@@ -1,11 +1,12 @@
 package com.drivaltech.finance.dto;
 
 import com.drivaltech.finance.user.Role;
+import java.util.Set;
 
 public class UpdateUserRequest {
 
     private String username;
-    private Role role;
+    private Set<Role> roles;
 
     public String getUsername() {
         return username;
@@ -15,11 +16,11 @@ public class UpdateUserRequest {
         this.username = username;
     }
 
-    public Role getRole() {
-        return role;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

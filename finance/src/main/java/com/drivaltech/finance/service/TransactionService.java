@@ -11,12 +11,12 @@ import com.drivaltech.finance.exception.ForbiddenException;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 import com.drivaltech.finance.repository.CategoryRepository;
 import com.drivaltech.finance.repository.TransactionRepository;
+import com.drivaltech.finance.user.Role;
 import com.drivaltech.finance.user.User;
 import com.drivaltech.finance.user.UserRepository;
 
 import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -169,7 +169,7 @@ public class TransactionService {
                 );
 
         boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN);
 
         if (!isOwner && !isAdmin) {
             log.warn("Unauthorized access | userId={} | transactionId={}",
@@ -191,7 +191,7 @@ public class TransactionService {
                         "Transaction not found with id: " + id));
 
         boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN);
 
         if (!isOwner && !isAdmin) {
             log.warn("Unauthorized update | userId={} | transactionId={}",
@@ -252,7 +252,7 @@ public class TransactionService {
                         "Transaction not found with id: " + id));
 
         boolean isOwner = transaction.getUser().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
+        boolean isAdmin = user.getRoles().contains(Role.ADMIN);
 
         if (!isOwner && !isAdmin) {
             log.warn("Unauthorized delete | userId={} | transactionId={}",

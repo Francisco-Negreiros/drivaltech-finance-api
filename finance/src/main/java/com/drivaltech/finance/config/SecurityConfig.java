@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         // protected endpoints
                         .requestMatchers("/dashboard/**").authenticated()
+                        .requestMatchers("/transactions/**").authenticated()
                         // fallback
                         .anyRequest().authenticated()
                 )

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -25,21 +26,26 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String username) {
-        return generateToken(new HashMap<>(), username);
-    }
+    // NOVO MÉTODO PRINCIPAL (COM ROLES)
+    public String generateToken(UserDetails userDetails) {
 
-    public String generateToken(Map<String, Object> extraClaims, String username) {
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("roles", userDetails.getAuthorities()
+                .stream()
+                .map(auth -> auth.getAuthority())
+                .toList());
 
         return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(username)
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey())
                 .compact();
     }
 
+    // EXTRAIR TODAS AS CLAIMS
     private Claims extractAllClaims(String token) {
 
         return Jwts.parserBuilder()
@@ -49,10 +55,17 @@ public class JwtService {
                 .getBody();
     }
 
+    // EXTRAIR USERNAME
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
+    // EXTRAIR ROLES (NOVO)
+    public List<String> extractRoles(String token) {
+        return extractAllClaims(token).get("roles", List.class);
+    }
+
+    // VALIDAR TOKEN
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
             final String username = extractUsername(token);
@@ -65,6 +78,7 @@ public class JwtService {
         }
     }
 
+    // EXPIRAÇÃO
     private boolean isTokenExpired(String token) {
 
         return extractAllClaims(token)
