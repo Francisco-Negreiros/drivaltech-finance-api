@@ -31,7 +31,6 @@ public class UserController {
         User user = userService.createUser(
                 request.getUsername(),
                 request.getPassword()
-                //request.getRole()
         );
 
         return userMapper.toResponse(user);

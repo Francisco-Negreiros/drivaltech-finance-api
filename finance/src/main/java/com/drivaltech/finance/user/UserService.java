@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.drivaltech.finance.exception.ResourceNotFoundException;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -14,6 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private Set<Role> roles;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder) {
@@ -28,7 +30,7 @@ public class UserService {
         User user = new User(
                 username,
                 encodedPassword,
-                Role.USER
+                Set.of(Role.USER)
         );
 
         return userRepository.save(user);
@@ -56,7 +58,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setUsername(request.getUsername());
-        user.setRole(request.getRole());
+        user.setRoles(request.getRoles());
 
         return userRepository.save(user);
     }

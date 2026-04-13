@@ -11,7 +11,10 @@ public class UserMapper {
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getRole(),
+                user.getRoles()
+                        .stream()
+                        .map(Enum::name)
+                        .toList(),
                 user.isActive()
         );
     }
