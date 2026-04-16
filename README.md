@@ -4,7 +4,7 @@
 
 ### This is a financial management API built with Spring Boot, designed to simulate real-world backend scenarios such as:
 
-- User authentication and authorization (JWT)
+- User authentication and authorization (JWT with role-based access control and frontend integration)
 - Role-based access control (ADMIN / USER)
 - Multi-tenant data isolation
 - Transaction management
@@ -249,7 +249,71 @@ jwt:
 
 #### This allows environment-based configuration (dev, staging, production).
 
---- 
+---
+
+## Authentication Endpoint
+
+### Login
+
+```http
+POST /auth/login
+```
+
+#### Request Body
+
+```json
+{
+  "username": "user",
+  "password": "password"
+}
+```
+
+#### Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+## How to Use the Token
+
+#### All protected endpoints require the JWT token in the Authorization header:
+
+```http
+Authorization: Bearer <your-token>
+```
+
+### Example
+
+```http
+GET /transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+---
+
+## CORS Configuration
+
+#### To enable communication with the frontend application, CORS is configured globally.
+
+### Allowed Origin
+
+```
+http://localhost:5173
+```
+
+### Details
+
+* All HTTP methods are allowed
+* All headers are allowed
+* Credentials are supported
+
+#### This allows secure integration with the React frontend.
+
+---
 
 ## Caching Strategy (Redis)
 
