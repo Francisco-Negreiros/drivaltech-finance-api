@@ -29,6 +29,7 @@ public class SecurityConfig {
             DaoAuthenticationProvider authenticationProvider) throws Exception {
 
         http
+                .cors(cors -> {})
                 // desabilita CSRF (API REST)
                 .csrf(csrf -> csrf.disable())
 
