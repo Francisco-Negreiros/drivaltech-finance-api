@@ -2,6 +2,9 @@ package com.drivaltech.finance.domain;
 
 import com.drivaltech.finance.user.User;
 import jakarta.persistence.*;
+import com.drivaltech.finance.domain.CategoryType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import java.util.UUID;
 
@@ -29,19 +32,21 @@ public class Category {
     public Category() {
     }
 
-    public Category(UUID id, String name, String description, String color, Boolean active) {
+    public Category(UUID id, String name, String description, String color, Boolean active, CategoryType type) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.color = color;
         this.active = active;
+        this.type = type;
     }
+
+    @Enumerated(EnumType.STRING)
+    private CategoryType type;
 
     public UUID getId() {
         return id;
     }
-
-    //public void setId(UUID id) {this.id = id;}
 
     public String getName() {
         return name;
@@ -82,6 +87,10 @@ public class Category {
     public void setId(UUID id) {
         this.id = id;
     }
+
+    public CategoryType getType() {return type;}
+
+    public void setType(CategoryType type) {this.type = type;}
 
     // getters e setters
 }

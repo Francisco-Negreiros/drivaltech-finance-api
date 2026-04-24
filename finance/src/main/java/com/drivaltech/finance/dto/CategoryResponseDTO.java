@@ -1,6 +1,7 @@
 package com.drivaltech.finance.dto;
 
 import java.util.UUID;
+import com.drivaltech.finance.domain.CategoryType;
 
 public class CategoryResponseDTO {
 
@@ -9,13 +10,15 @@ public class CategoryResponseDTO {
     private String description;
     private String color;
     private Boolean active;
+    private CategoryType type;
 
-    public CategoryResponseDTO(UUID id, String name, String description, String color, Boolean active) {
+    public CategoryResponseDTO(UUID id, String name, String description, String color, Boolean active, CategoryType type) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.color = color;
         this.active = active;
+        this.type = type;
     }
 
     public UUID getId() {
@@ -37,5 +40,9 @@ public class CategoryResponseDTO {
     public Boolean getActive() {
         return active;
     }
+
+    public CategoryType getType() {return type;}
+
+    public void setType(CategoryType type) {this.type = type;}
 }
 

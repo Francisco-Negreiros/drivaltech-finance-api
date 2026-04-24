@@ -46,7 +46,8 @@ public class CategoryService {
                 dto.getName(),
                 dto.getDescription(),
                 dto.getColor(),
-                true
+                true,
+                dto.getType()
         );
 
         category.setUser(user); // vínculo com usuário
@@ -147,7 +148,8 @@ public class CategoryService {
                 category.getName(),
                 category.getDescription(),
                 category.getColor(),
-                category.isActive()
+                category.isActive(),
+                category.getType()
         );
     }
 

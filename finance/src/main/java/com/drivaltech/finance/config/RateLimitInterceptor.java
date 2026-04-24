@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
 
-    private static final int MAX_REQUESTS = 5;
+    private static final int MAX_REQUESTS = 100;
     private static final long TIME_WINDOW = 60_000; // 1 minuto
 
     private final Map<String, RequestInfo> requests = new ConcurrentHashMap<>();
