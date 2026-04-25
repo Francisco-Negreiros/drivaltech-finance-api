@@ -1,6 +1,7 @@
 package com.drivaltech.finance.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import com.drivaltech.finance.domain.CategoryType;
 
 public class CategoryRequestDTO {
 
@@ -10,6 +11,8 @@ public class CategoryRequestDTO {
     private String description;
 
     private String color;
+
+    private CategoryType type;
 
     public CategoryRequestDTO() {
     }
@@ -25,5 +28,9 @@ public class CategoryRequestDTO {
     public String getColor() {
         return color;
     }
+
+    public CategoryType getType() {return type;}
+
+    // Getters and Setters
 }
 
